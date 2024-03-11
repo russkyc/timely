@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "Timely",
   "resources": {
-    "hash": "sha256-2y+CYlVurXygRlG/7iMIaqj1GtpW2qoI78p5QiGMcAc=",
+    "hash": "sha256-090jtXI/rBbVO9gBk1q2lwELoNUF+nQkjWERYoDGEq0=",
     "jsModuleNative": {
       "dotnet.native.8.0.2.jgt5nhn140.js": "sha256-gPMK16QWoJSTxorlZJqcVtbBRTniIQWlLsJN2O4cJHg="
     },
@@ -54,7 +54,7 @@
       "System.Text.Json.wasm": "sha256-3/bIvgVgVhB9/duzNWrcrJlCeoTQfDU/fJ7uiYpUs08=",
       "System.Text.RegularExpressions.wasm": "sha256-M4UNSRFLG3COW+ZHYCcrc+FbbL9bh5tI1dL3ez12dBg=",
       "System.Threading.wasm": "sha256-4TmhC4Lm0NRFX9yCf3kXn0aHg8XyCL+hM29B5fk4ixU=",
-      "Timely.wasm": "sha256-yPXRu2K9ExROM7pp+lulA6MfqopS2tIjnF/bS33/CWI="
+      "Timely.wasm": "sha256-57lRJ/4IGiXQtUWyD76g4q49WrgpMpGoJWp76b40k5k="
     }
   },
   "cacheBootResources": true,
