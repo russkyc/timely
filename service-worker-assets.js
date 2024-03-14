@@ -57,7 +57,7 @@
       "url": "_framework\/icudt_no_CJK.dat.br"
     },
     {
-      "hash": "sha256-eMyxSw1AZcjS5UohInklNa7Xp0WdlFVgyuRC\/PBwPqg=",
+      "hash": "sha256-D\/L70TOHqOZwyrb2XkZfusTiE5FinrmkK5RKC6a\/wog=",
       "url": "_framework\/blazor.boot.json.br"
     },
     {
@@ -157,7 +157,7 @@
       "url": "_framework\/System.Console.wasm.br"
     },
     {
-      "hash": "sha256-sXrb3185ZTFF4GIV\/f0qDh8AcJ6I5kSTsglOkydXnlQ=",
+      "hash": "sha256-x2OXnCZBQRW7mbQi2f7873VheLZr6L93KrjJZJRsUxc=",
       "url": "_framework\/System.Linq.wasm.br"
     },
     {
@@ -177,7 +177,7 @@
       "url": "_framework\/System.ObjectModel.wasm.br"
     },
     {
-      "hash": "sha256-L\/YDGVWJdy\/n6xZ5mIl0d1ILjTA\/fmdgqqsLzByz4xw=",
+      "hash": "sha256-rpBbbzLYJgstmQvQtDv0IBwfwFCsdYMHsucaUgEROI4=",
       "url": "_framework\/System.Private.CoreLib.wasm.br"
     },
     {
@@ -209,7 +209,7 @@
       "url": "_framework\/System.Threading.wasm.br"
     },
     {
-      "hash": "sha256-nl22UymTLeK7ac36fSTfjtVqJIvS9\/CEGT2eQgF0TJA=",
+      "hash": "sha256-HMuJeQ3YRZ7U2QCH8lESMQTymT8rcUX0j51ge7fW4ck=",
       "url": "_framework\/Timely.wasm.br"
     },
     {
@@ -229,5 +229,5 @@
       "url": "brotliloader.min.js"
     }
   ],
-  "version": "HGfg4XCX"
+  "version": "s95Of6fi"
 };
