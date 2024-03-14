@@ -58,10 +58,17 @@
         {
             if (_timeRecords is not null)
             {
-                <MudButton OnClick="@ClearRecords" StartIcon="@Icons.Material.Rounded.Delete" Color="Color.Primary" Variant="Variant.Text" DisableElevation="true" >
-                    <MudText Class="text-xl font-medium">Clear Records</MudText>
+                <MudPaper Elevation="0" Class="rounded-lg bg-[--mud-palette-primary]">
+                    <MudStack Spacing="0" Class="m-4">
+                        <MudText Class="text-lg md:text-xl font-medium text-white mx-auto">You Have Logged</MudText>
+                        <MudText Class="text-4xl md:text-6xl font-bold text-white mx-auto">@($"{_timeLogged.Value.TotalHours:0.00} Hours")</MudText>
+                    </MudStack>
+                </MudPaper>
+                <MudButton OnClick="@ClearRecords" StartIcon="@Icons.Material.Rounded.Delete" Color="Color.Primary" Variant="Variant.Text" DisableElevation="true">
+                    <MudText Class="text-xl font-medium">Clear Records Test</MudText>
                 </MudButton>
             }
+
             <div class="h-full overflow-y-auto">
                 <MudStack Class="flex h-full w-full">
                     @if (_timeRecords is not null)
@@ -92,6 +99,7 @@
     private Shift? _currentShift;
     private MudTabs? _tabControl;
     private DateTime _currentTime = DateTime.Now;
+    private TimeSpan? _timeLogged;
 
     private LinkedList<Shift>? _timeRecords = new();
 
@@ -113,6 +121,10 @@
             while (true)
             {
                 _currentTime = DateTime.Now;
+                var totalTimeRecordTicks = _timeRecords.Select(
+                        timeRecord => new TimeSpan(timeRecord.ShiftEnd.Ticks - timeRecord.ShiftStart.Ticks))
+                    .Sum(timeSpans => timeSpans.Ticks);
+                _timeLogged = new TimeSpan(totalTimeRecordTicks);
                 StateHasChanged();
                 await Task.Delay(TimeSpan.FromSeconds(1));
             }
