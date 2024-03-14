@@ -17,7 +17,7 @@
       "url": "index.html"
     },
     {
-      "hash": "sha256-7emlVm8vsxYsqpdBFdiziYGYcU8rxgN6MHJb+2lGBi4=",
+      "hash": "sha256-nr9kI06ZgpoA5aIQHmROMRP6HOIQAJzqZjAkWefDuFo=",
       "url": "manifest.webmanifest"
     },
     {
@@ -57,7 +57,7 @@
       "url": "_framework\/icudt_no_CJK.dat.br"
     },
     {
-      "hash": "sha256-ocfmgB++uolCl4VuXDZs7z+9wYTUBbsrWaiobjupiE8=",
+      "hash": "sha256-blDCISjfLL157aY9\/71BBqdxKc693hZxqOVV7Hh6Yv0=",
       "url": "_framework\/blazor.boot.json.br"
     },
     {
@@ -67,6 +67,10 @@
     {
       "hash": "sha256-qNo1YbwvkSiEIoQ2FlskFTZjSc\/kpHcYZSBAJKSX82U=",
       "url": "_framework\/Humanizer.wasm.br"
+    },
+    {
+      "hash": "sha256-5KIEOQkNnN5qu48EB1Zr6ErvLG6Xn+iVOGcBIcuPkRY=",
+      "url": "_framework\/Majorsoft.Blazor.Components.Timer.wasm.br"
     },
     {
       "hash": "sha256-Wv2Q0os7CAA8nJsH61ASAKpRePYqFZ8h1KbEgVneSRY=",
@@ -141,12 +145,16 @@
       "url": "_framework\/System.Collections.Concurrent.wasm.br"
     },
     {
-      "hash": "sha256-6bwVsAvKVi8kh\/J+c4ZFe12Jgrb4uReAxlrVsayxcmE=",
+      "hash": "sha256-Q\/cs4UfWbnEfdJ4VvTWFFdKX+GAOO\/gdR5+x8d+fY64=",
       "url": "_framework\/System.Collections.wasm.br"
     },
     {
-      "hash": "sha256-zNqVLYyCVMDmfQUeZgqzSEWLgjLZ1snbqw2cGBHODOw=",
+      "hash": "sha256-luqU7aUmuNAoplylC3WcUNDFgTYMB8jhdZIh+Ub3TCs=",
       "url": "_framework\/System.ComponentModel.Primitives.wasm.br"
+    },
+    {
+      "hash": "sha256-VUOPIBeri\/vChJD6m4CvjvV2ndX5p\/scYXKm19gl8TE=",
+      "url": "_framework\/System.ComponentModel.TypeConverter.wasm.br"
     },
     {
       "hash": "sha256-uwZkm\/mPRsSfRQOOtUMYeZIMaDwRyiHecgDxB54ForA=",
@@ -177,7 +185,7 @@
       "url": "_framework\/System.ObjectModel.wasm.br"
     },
     {
-      "hash": "sha256-rpBbbzLYJgstmQvQtDv0IBwfwFCsdYMHsucaUgEROI4=",
+      "hash": "sha256-rLjOgCqY3mWgQn7WLyTLJwQvdjgCkDhq6M7r+Gs3JE0=",
       "url": "_framework\/System.Private.CoreLib.wasm.br"
     },
     {
@@ -189,7 +197,7 @@
       "url": "_framework\/System.Runtime.InteropServices.JavaScript.wasm.br"
     },
     {
-      "hash": "sha256-be2xspCMvVkBerRiC\/CD+3VARwryg9Nd5GSy4zNIMq0=",
+      "hash": "sha256-HicfOF7agHGhqcuarhp9Rvq95CBTect7E8yqpF7ba58=",
       "url": "_framework\/System.Runtime.wasm.br"
     },
     {
@@ -209,7 +217,11 @@
       "url": "_framework\/System.Threading.wasm.br"
     },
     {
-      "hash": "sha256-8G9OQx6r\/Fjse8zmhX8wBSezcqzT54pVpYLJNTJd9no=",
+      "hash": "sha256-YiEDFfBQMkHHCJWvv9cKX0yS4HB0hVaHpIWFaI2DPMs=",
+      "url": "_framework\/System.wasm.br"
+    },
+    {
+      "hash": "sha256-KCaCisxmGXhpabAMJpJ8EPnF2LcslQgToAYKg7OYdDk=",
       "url": "_framework\/Timely.wasm.br"
     },
     {
@@ -229,5 +241,5 @@
       "url": "brotliloader.min.js"
     }
   ],
-  "version": "RjGhouZe"
+  "version": "cgeomJ9F"
 };
