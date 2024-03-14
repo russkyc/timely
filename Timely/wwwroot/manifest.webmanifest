@@ -1,6 +1,7 @@
 {
   "name": "Timely",
   "short_name": "Timely",
+  "version": 2.0,
   "id": "./",
   "start_url": "./",
   "display": "standalone",
