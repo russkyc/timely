@@ -69,17 +69,23 @@
                 </MudButton>
             }
 
-            <div class="h-full overflow-y-auto">
-                <MudStack Class="flex h-full w-full">
-                    @if (_timeRecords is not null)
-                    {
-                        foreach (var shift in _timeRecords)
+            @if (_timeRecords is not null && _timeRecords.Any())
+            {
+                <div class="h-full overflow-y-auto">
+                    <MudStack Class="flex h-full w-full">
+                        @foreach (var shift in _timeRecords)
                         {
                             <TimeRecord Shift="shift"/>
                         }
-                    }
-                </MudStack>
-            </div>
+                    </MudStack>
+                </div>
+            }
+            else
+            {
+                <div class="flex h-full w-full">
+                    <MudText Class="m-auto">No data recorded.</MudText>
+                </div>
+            }
         }
     }
     <MudSpacer/>
@@ -147,7 +153,7 @@
     private async Task OnTimerTick()
     {
         _currentTime = DateTime.Now;
-        
+
         await ShiftManager.GetDataFromLocalStorage();
 
         _timeRecords = await ShiftManager.GetTimeRecords();
@@ -163,10 +169,10 @@
             var totalTimeRecordTicks = _timeRecords.Select(
                     timeRecord => new TimeSpan(timeRecord.ShiftEnd.Ticks - timeRecord.ShiftStart.Ticks))
                 .Sum(timeSpans => timeSpans.Ticks);
-        
+
             _timeLogged = new TimeSpan(totalTimeRecordTicks);
         }
-        
+
         await InvokeAsync(StateHasChanged);
     }
 }
