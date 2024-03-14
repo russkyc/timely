@@ -20,7 +20,9 @@ public class ShiftManager
         _currentShift = await _localStorage.GetItemAsync<Shift?>("current-shift");
         
         var timeRecords = await _localStorage.GetItemAsync<LinkedList<Shift>?>("time-records");
-        _timeRecords = timeRecords ?? new LinkedList<Shift>();
+        _timeRecords = timeRecords ?? new LinkedList<Shift>(Enumerable.Empty<Shift>());
+
+        await UpdateTimeRecords();
     }
     
     public async Task UpdateTimeRecords()

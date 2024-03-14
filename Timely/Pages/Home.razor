@@ -56,7 +56,7 @@
 
         if (_tabControl.ActivePanelIndex == 1)
         {
-            if (_timeRecords is not null)
+            if (_timeRecords is not null && _timeRecords.Any() && _timeLogged is not null)
             {
                 <MudPaper Elevation="0" Class="rounded-lg bg-[--mud-palette-primary]">
                     <MudStack Spacing="0" Class="m-4">
@@ -65,7 +65,7 @@
                     </MudStack>
                 </MudPaper>
                 <MudButton OnClick="@ClearRecords" StartIcon="@Icons.Material.Rounded.Delete" Color="Color.Primary" Variant="Variant.Text" DisableElevation="true">
-                    <MudText Class="text-xl font-medium">Clear Records Test</MudText>
+                    <MudText Class="text-xl font-medium">Clear Records</MudText>
                 </MudButton>
             }
 
@@ -88,7 +88,7 @@
         <MudTabPanel Icon="@Icons.Material.Rounded.List" Text="Records"/>
     </MudTabs>
 </MudStack>
-
+<AdvancedTimer IntervalInMilisec="1000" Occurring="@Times.Infinite()" OnIntervalElapsed="@OnTimerTick"/>
 @inject ShiftManager ShiftManager
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
@@ -106,29 +106,6 @@
     protected override async Task OnInitializedAsync()
     {
         Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
-        await ShiftManager.GetDataFromLocalStorage();
-
-        _timeRecords = await ShiftManager.GetTimeRecords();
-        _currentShift = await ShiftManager.GetCurrentShift();
-
-        if (_currentShift is not null)
-        {
-            _shiftStarted = true;
-        }
-
-        Task.Run(async () =>
-        {
-            while (true)
-            {
-                _currentTime = DateTime.Now;
-                var totalTimeRecordTicks = _timeRecords.Select(
-                        timeRecord => new TimeSpan(timeRecord.ShiftEnd.Ticks - timeRecord.ShiftStart.Ticks))
-                    .Sum(timeSpans => timeSpans.Ticks);
-                _timeLogged = new TimeSpan(totalTimeRecordTicks);
-                StateHasChanged();
-                await Task.Delay(TimeSpan.FromSeconds(1));
-            }
-        });
     }
 
     async Task StartShift()
@@ -167,4 +144,29 @@
         Snackbar.Add("Time records cleared");
     }
 
+    private async Task OnTimerTick()
+    {
+        _currentTime = DateTime.Now;
+        
+        await ShiftManager.GetDataFromLocalStorage();
+
+        _timeRecords = await ShiftManager.GetTimeRecords();
+        _currentShift = await ShiftManager.GetCurrentShift();
+
+        if (_currentShift is not null)
+        {
+            _shiftStarted = true;
+        }
+
+        if (_timeRecords is not null && _timeRecords.Any())
+        {
+            var totalTimeRecordTicks = _timeRecords.Select(
+                    timeRecord => new TimeSpan(timeRecord.ShiftEnd.Ticks - timeRecord.ShiftStart.Ticks))
+                .Sum(timeSpans => timeSpans.Ticks);
+        
+            _timeLogged = new TimeSpan(totalTimeRecordTicks);
+        }
+        
+        await InvokeAsync(StateHasChanged);
+    }
 }
