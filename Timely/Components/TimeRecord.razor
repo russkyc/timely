@@ -1,29 +1,41 @@
 ﻿@using Timely.Models
 @using Humanizer
+@using Microsoft.EntityFrameworkCore
+@using Timely.Services.Data
 <MudPaper Elevation="0" Class="rounded-lg bg-[#f3f2fc] p-3">
     <MudStack Row="true">
         <MudPaper Elevation="0" Class="flex flex-col p-0 flex-shrink-0 w-20 h-20 rounded-lg bg-[--mud-palette-primary]">
             <MudStack Spacing="0" Class="m-1 m-auto">
-                <MudText Class="text-3xl md:text-4xl font-bold text-white mx-auto">@Shift.ShiftStart.ToString("dd")</MudText>
-                <MudText Class="text-xl font-medium text-white mx-auto">@Shift.ShiftStart.ToString("MMMM")</MudText>
+                <MudText Class="text-3xl md:text-4xl font-bold text-white mx-auto">@Shift.Date.ToString("dd")</MudText>
+                <MudText Class="text-xl font-medium text-white mx-auto">@Shift.Date.ToString("MMMM")</MudText>
             </MudStack>
         </MudPaper>
         <MudStack Spacing="2">
-            <MudText Class="text-2xl md:text-4xl font-bold text-[--mud-palette-primary]">@((Shift.ShiftEnd - Shift.ShiftStart).ToString("hh\\:mm\\:ss")) Shift</MudText>
+            <MudText Class="text-2xl md:text-4xl font-bold text-[--mud-palette-primary]">@((Shift.ShiftEnd.Value - Shift.ShiftStart.Value).ToString("hh\\:mm\\:ss")) Shift</MudText>
             <MudChipSet ReadOnly="true">
                 <MudChip Color="Color.Primary" Size="Size.Small" Class="p-2">
-                    <MudText Class="text-md font-medium mx-auto">@Shift.ShiftStart.ToString("t")</MudText>
+                    <MudText Class="text-md font-medium mx-auto">@((DateTime.Today + Shift.ShiftStart.Value).ToString("t"))</MudText>
                 </MudChip>
                 -
                 <MudChip Color="Color.Primary" Size="Size.Small" Class="p-2">
-                    <MudText Class="text-md font-medium mx-auto">@Shift.ShiftEnd.ToString("t")</MudText>
+                    <MudText Class="text-md font-medium mx-auto">@((DateTime.Today + Shift.ShiftEnd.Value).ToString("t"))</MudText>
                 </MudChip>
             </MudChipSet>
         </MudStack>
+        <MudButton OnClick="@Delete" StartIcon="@Icons.Material.Rounded.Delete" Color="Color.Primary" Variant="Variant.Text" DisableElevation="true">
+        </MudButton>
     </MudStack>
 </MudPaper>
 
 @code {
 
     [Parameter] public Shift Shift { get; set; }
+
+    private async Task Delete()
+    {
+        await using var db = new AppDbContext();
+        await db.Shifts.Where(shift => shift.Id == Shift.Id).ExecuteDeleteAsync();
+        await db.SaveToCacheAsync();
+    }
+
 }

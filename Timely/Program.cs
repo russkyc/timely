@@ -1,3 +1,4 @@
+using BlazorDB;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -19,4 +20,8 @@ builder.Services.AddBlazoredLocalStorage();
 // App Services
 builder.Services.AddScoped<ShiftManager>();
 
-await builder.Build().RunAsync();
+var app = builder.Build();
+
+await app.Services.ConfigureBlazorDBAsync<AppDbContext>();
+
+await app.RunAsync();

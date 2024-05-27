@@ -2,6 +2,9 @@
 
 public record Shift
 {
-    public DateTime ShiftStart { get; set; }
-    public DateTime ShiftEnd { get; set; }
+    public int Id { get; set; }
+    public DateTime Date { get; set; }
+    public TimeSpan? ShiftStart { get; set; }
+    public TimeSpan? ShiftEnd { get; set; }
+    public bool Active { get; set; }
 }

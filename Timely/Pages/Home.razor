@@ -12,7 +12,7 @@
                 <MudPaper Elevation="0" Class="rounded-lg bg-[--mud-palette-primary]">
                     <MudStack Spacing="0" Class="m-4">
                         <MudText Class="text-lg md:text-xl font-medium text-white mx-auto">@_currentTime.ToString("dddd, MMMM dd - hh\\:mm\\:ss tt")</MudText>
-                        <MudText Class="text-4xl mt-4 md:text-6xl font-bold text-white mx-auto">@((DateTime.Now - _currentShift.ShiftStart).ToString(@"hh\:mm\:ss"))</MudText>
+                        <MudText Class="text-4xl mt-4 md:text-6xl font-bold text-white mx-auto">@((DateTime.Now - _currentShift.ShiftStart.Value).ToString(@"hh\:mm\:ss"))</MudText>
                         <MudText Class="mt-4 text-xl md:text-2xl font-bold text-[--mud-palette-primary] mx-auto bg-white p-2 px-4 rounded-lg">Shift Ongoing</MudText>
                     </MudStack>
                 </MudPaper>
@@ -64,8 +64,8 @@
                         <MudText Class="text-4xl md:text-6xl font-bold text-white mx-auto">@($"{_timeLogged.Value.TotalHours:0.00} Hours")</MudText>
                     </MudStack>
                 </MudPaper>
-                <MudButton OnClick="@ClearRecords" StartIcon="@Icons.Material.Rounded.Delete" Color="Color.Primary" Variant="Variant.Text" DisableElevation="true">
-                    <MudText Class="text-xl font-medium">Clear Records</MudText>
+                <MudButton OnClick="@AddRecord" StartIcon="@Icons.Material.Filled.AddAlarm" Color="Color.Primary" Variant="Variant.Text" DisableElevation="true">
+                    <MudText Class="text-xl font-medium">Add Record</MudText>
                 </MudButton>
             }
 
@@ -77,11 +77,17 @@
                         {
                             <TimeRecord Shift="shift"/>
                         }
+                        <MudButton OnClick="@ClearRecords" StartIcon="@Icons.Material.Rounded.Delete" Color="Color.Primary" Variant="Variant.Text" DisableElevation="true">
+                            <MudText Class="text-xl font-medium">Clear Records</MudText>
+                        </MudButton>
                     </MudStack>
                 </div>
             }
             else
             {
+                <MudButton OnClick="@AddRecord" StartIcon="@Icons.Material.Filled.AddAlarm" Color="Color.Primary" Variant="Variant.Text" DisableElevation="true">
+                    <MudText Class="text-xl font-medium">Add Record</MudText>
+                </MudButton>
                 <div class="flex h-full w-full">
                     <MudText Class="m-auto">No data recorded.</MudText>
                 </div>
@@ -107,7 +113,7 @@
     private DateTime _currentTime = DateTime.Now;
     private TimeSpan? _timeLogged;
 
-    private LinkedList<Shift>? _timeRecords = new();
+    private IEnumerable<Shift>? _timeRecords;
 
     protected override async Task OnInitializedAsync()
     {
@@ -118,7 +124,7 @@
     {
         _currentShift = new Shift
         {
-            ShiftStart = DateTime.Now
+            ShiftStart = DateTime.Now.TimeOfDay
         };
 
         await ShiftManager.StartShift();
@@ -135,6 +141,21 @@
         Snackbar.Add("Shift ended, record saved");
     }
 
+    async Task AddRecord()
+    {
+        var dialog = await DialogService.ShowAsync<AddRecordDialog>("Add Record");
+        var result = await dialog.Result;
+
+        if (result.Canceled)
+        {
+            return;
+        }
+
+        if (result.Data is not Shift shift) return;
+
+        await ShiftManager.AddTimeRecord(shift);
+    }
+
     async Task ClearRecords()
     {
         var result = await DialogService.ShowMessageBox("Clear Time Records", "This action cannot be undone, continue?");
@@ -145,7 +166,6 @@
         }
 
         await ShiftManager.ClearTimeRecords();
-        await ShiftManager.GetDataFromLocalStorage();
         _timeRecords = await ShiftManager.GetTimeRecords();
         Snackbar.Add("Time records cleared");
     }
@@ -153,8 +173,6 @@
     private async Task OnTimerTick()
     {
         _currentTime = DateTime.Now;
-
-        await ShiftManager.GetDataFromLocalStorage();
 
         _timeRecords = await ShiftManager.GetTimeRecords();
         _currentShift = await ShiftManager.GetCurrentShift();
@@ -167,8 +185,8 @@
         if (_timeRecords is not null && _timeRecords.Any())
         {
             var totalTimeRecordTicks = _timeRecords.Select(
-                    timeRecord => new TimeSpan(timeRecord.ShiftEnd.Ticks - timeRecord.ShiftStart.Ticks))
-                .Sum(timeSpans => timeSpans.Ticks);
+                    timeRecord => timeRecord.ShiftEnd - timeRecord.ShiftStart)
+                .Sum(timerecord => timerecord.Value.Ticks);
 
             _timeLogged = new TimeSpan(totalTimeRecordTicks);
         }

@@ -1,75 +1,97 @@
 ﻿using Blazored.LocalStorage;
+using Microsoft.EntityFrameworkCore;
 using Timely.Models;
 
 namespace Timely.Services.Data;
 
 public class ShiftManager
 {
-    private Shift? _currentShift;
-    private LinkedList<Shift>? _timeRecords;
-    private ILocalStorageService _localStorage;
-
-    public ShiftManager(ILocalStorageService localStorage)
-    {
-        _localStorage = localStorage;
-        _timeRecords = new LinkedList<Shift>();
-    }
-
-    public async Task GetDataFromLocalStorage()
-    {
-        _currentShift = await _localStorage.GetItemAsync<Shift?>("current-shift");
-        
-        var timeRecords = await _localStorage.GetItemAsync<LinkedList<Shift>?>("time-records");
-        _timeRecords = timeRecords ?? new LinkedList<Shift>(Enumerable.Empty<Shift>());
-
-        await UpdateTimeRecords();
-    }
+    private Shift? _activeShift;
     
-    public async Task UpdateTimeRecords()
+    public ShiftManager()
     {
-        await _localStorage.SetItemAsync("time-records", _timeRecords);
+        using var db = new AppDbContext();
+        db.Database.EnsureCreated();
     }
 
     public async Task AddTimeRecord(Shift shift)
     {
-        _timeRecords.AddFirst(shift);
-        await UpdateTimeRecords();
-        await GetDataFromLocalStorage();
+        await using var db = new AppDbContext();
+        await db.Shifts.AddAsync(shift);
+        await db.SaveToCacheAsync();
     }
     
-    public async Task<LinkedList<Shift>?> GetTimeRecords()
+    public async Task<IEnumerable<Shift>?> GetTimeRecords()
     {
-        return await _localStorage.GetItemAsync<LinkedList<Shift>?>("time-records");
+        await using var db = new AppDbContext();
+        return await db.Shifts.Where(shift => !shift.Active).ToListAsync();
     }
 
     public async Task ClearTimeRecords()
     {
-        await _localStorage.RemoveItemAsync("time-records");
-        await GetDataFromLocalStorage();
+        await using var db = new AppDbContext();
+        await db.Shifts.AsQueryable().ExecuteDeleteAsync();
+        await db.SaveToCacheAsync();
     }
 
     public async Task<Shift?> GetCurrentShift()
     {
-        return await _localStorage.GetItemAsync<Shift>("current-shift");
+        if (_activeShift is not null) return _activeShift;
+        
+        await using var db = new AppDbContext();
+        _activeShift = await db.Shifts.FirstOrDefaultAsync(shift => shift.Active);
+
+        return _activeShift;
+    }
+    
+    public async Task AddShift(TimeSpan start, TimeSpan end, DateTime? date = null)
+    {
+        
+        var shift = new Shift()
+        {
+            ShiftStart = start,
+            ShiftEnd = end,
+            Date = date ?? DateTime.Today
+        };
+
+        await using var db = new AppDbContext();
+        await db.Shifts.AddAsync(shift);
+        await db.SaveToCacheAsync();
+
     }
     
     public async Task StartShift()
     {
-        _currentShift ??= new Shift()
+        if (_activeShift is not null) return;
+        
+        var shift = new Shift()
         {
-            ShiftStart = DateTime.Now
+            Date = DateTime.Today,
+            ShiftStart = DateTime.Now.TimeOfDay,
+            Active = true
         };
         
-        await _localStorage.SetItemAsync("current-shift",_currentShift);
+        await using var db = new AppDbContext();
+        var entry = await db.Shifts.AddAsync(shift);
+        await db.SaveToCacheAsync();
+
+        _activeShift = entry.Entity;
+
     }
 
     public async Task EndShift()
     {
-        _currentShift.ShiftEnd = DateTime.Now;
+        await GetCurrentShift();
         
-        await AddTimeRecord(_currentShift);
+        await using var db = new AppDbContext();
+        if (_activeShift is null) return;
 
-        await _localStorage.RemoveItemAsync("current-shift");
-        await GetDataFromLocalStorage();
+        _activeShift.Active = false;
+        _activeShift.ShiftEnd = DateTime.Now.TimeOfDay;
+        
+        db.Shifts.Update(_activeShift);
+        await db.SaveToCacheAsync();
+
+        _activeShift = null;
     }
 }
