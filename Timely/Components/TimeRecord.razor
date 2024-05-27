@@ -22,10 +22,14 @@
                 </MudChip>
             </MudChipSet>
         </MudStack>
-        <MudButton OnClick="@Delete" StartIcon="@Icons.Material.Rounded.Delete" Color="Color.Primary" Variant="Variant.Text" DisableElevation="true">
+        <MudSpacer/>
+        <MudButton FullWidth="false" Size="Size.Small" Class="h-min w-4 m-auto" OnClick="@Delete" Color="Color.Primary" Variant="Variant.Filled" DisableElevation="true">
+            <MudIcon Class="2-8 h-8" Icon="@Icons.Material.Rounded.Delete"></MudIcon>
         </MudButton>
     </MudStack>
 </MudPaper>
+
+@inject IDialogService DialogService
 
 @code {
 
@@ -33,6 +37,13 @@
 
     private async Task Delete()
     {
+        var result = await DialogService.ShowMessageBox("Delete Time Record", "This action cannot be undone, continue?");
+
+        if (result is null || !result.Value)
+        {
+            return;
+        }
+        
         await using var db = new AppDbContext();
         await db.Shifts.Where(shift => shift.Id == Shift.Id).ExecuteDeleteAsync();
         await db.SaveToCacheAsync();
