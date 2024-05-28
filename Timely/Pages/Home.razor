@@ -120,6 +120,14 @@
         Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await ShiftManager.GetData();
+        }
+    }
+
     async Task StartShift()
     {
         _currentShift = new Shift

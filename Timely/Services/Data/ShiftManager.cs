@@ -1,65 +1,60 @@
 ﻿using Blazored.LocalStorage;
-using Microsoft.EntityFrameworkCore;
 using Timely.Models;
 
 namespace Timely.Services.Data;
 
 public class ShiftManager
 {
+    private readonly ILocalStorageService _storage;
     private Shift? _activeShift;
+    private List<Shift>? _shifts = new();
     
-    public ShiftManager()
+    public ShiftManager(ILocalStorageService storage)
     {
-        using var db = new AppDbContext();
-        db.Database.EnsureCreated();
+        _storage = storage;
+    }
+
+    public async Task GetData()
+    {
+        _shifts = await _storage.GetItemAsync<List<Shift>>("shifts");
+        _activeShift = await _storage.GetItemAsync<Shift>("activeShift");
+    }
+
+    public async Task SaveData()
+    {
+        await _storage.SetItemAsync("activeShift", _activeShift);
+        await _storage.SetItemAsync("shifts", _shifts);
     }
 
     public async Task AddTimeRecord(Shift shift)
     {
-        await using var db = new AppDbContext();
-        await db.Shifts.AddAsync(shift);
-        await db.SaveToCacheAsync();
-    }
-    
-    public async Task<IEnumerable<Shift>?> GetTimeRecords()
-    {
-        await using var db = new AppDbContext();
-        return await db.Shifts.Where(shift => !shift.Active).ToListAsync();
-    }
+        await GetData();
+        
+        _shifts ??= new();
+        _shifts.Add(shift);
 
-    public async Task ClearTimeRecords()
-    {
-        await using var db = new AppDbContext();
-        await db.Shifts.AsQueryable().ExecuteDeleteAsync();
-        await db.SaveToCacheAsync();
+        await SaveData();
     }
 
     public async Task<Shift?> GetCurrentShift()
     {
-        if (_activeShift is not null) return _activeShift;
-        
-        await using var db = new AppDbContext();
-        _activeShift = await db.Shifts.FirstOrDefaultAsync(shift => shift.Active);
-
+        await GetData();
         return _activeShift;
     }
     
-    public async Task AddShift(TimeSpan start, TimeSpan end, DateTime? date = null)
+    public async Task<IEnumerable<Shift>?> GetTimeRecords()
     {
-        
-        var shift = new Shift()
-        {
-            ShiftStart = start,
-            ShiftEnd = end,
-            Date = date ?? DateTime.Today
-        };
-
-        await using var db = new AppDbContext();
-        await db.Shifts.AddAsync(shift);
-        await db.SaveToCacheAsync();
-
+        await GetData();
+        return _shifts;
     }
-    
+
+    public async Task ClearTimeRecords()
+    {
+        _shifts = null;
+        await _storage.RemoveItemAsync("shifts");
+        await SaveData();
+    }
+
     public async Task StartShift()
     {
         if (_activeShift is not null) return;
@@ -71,27 +66,25 @@ public class ShiftManager
             Active = true
         };
         
-        await using var db = new AppDbContext();
-        var entry = await db.Shifts.AddAsync(shift);
-        await db.SaveToCacheAsync();
+        _activeShift = shift;
 
-        _activeShift = entry.Entity;
-
+        await SaveData();
     }
 
     public async Task EndShift()
     {
-        await GetCurrentShift();
+        await GetData();
         
-        await using var db = new AppDbContext();
         if (_activeShift is null) return;
 
         _activeShift.Active = false;
         _activeShift.ShiftEnd = DateTime.Now.TimeOfDay;
-        
-        db.Shifts.Update(_activeShift);
-        await db.SaveToCacheAsync();
 
+        _shifts ??= new();
+        
+        _shifts.Add(_activeShift);
         _activeShift = null;
+        
+        await SaveData();
     }
 }
