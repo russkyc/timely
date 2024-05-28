@@ -151,7 +151,10 @@
 
     async Task AddRecord()
     {
-        var dialog = await DialogService.ShowAsync<AddRecordDialog>("Add Record");
+        var dialog = await DialogService.ShowAsync<AddRecordDialog>("Add Record", new DialogOptions()
+        {
+            FullScreen = true
+        });
         var result = await dialog.Result;
 
         if (result.Canceled)

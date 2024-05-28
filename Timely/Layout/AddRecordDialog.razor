@@ -8,8 +8,8 @@
     </TitleContent>
     <DialogContent>
         <MudDatePicker bind-Date="@_date" Label="Date"></MudDatePicker>
-        <MudTimePicker AmPm="true" @bind-Time="@Shift.ShiftStart" Label="Shift Start"/>
-        <MudTimePicker AmPm="true" @bind-Time="@Shift.ShiftEnd" Label="Shift End"/>
+        <MudTimePicker PickerVariant="PickerVariant.Dialog" AmPm="true" @bind-Time="@Shift.ShiftStart" Label="Shift Start"/>
+        <MudTimePicker PickerVariant="PickerVariant.Dialog" AmPm="true" @bind-Time="@Shift.ShiftEnd" Label="Shift End"/>
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancel</MudButton>
