@@ -31,6 +31,11 @@ public class ShiftManager
         await GetData();
         
         _shifts ??= new();
+
+        var lastEntry = _shifts.OrderBy(shift => shift.Id).FirstOrDefault();
+        var id = lastEntry is null ? 0 : lastEntry.Id + 1;
+        shift.Id = id;
+        
         _shifts.Add(shift);
 
         await SaveData();
@@ -59,8 +64,11 @@ public class ShiftManager
     {
         if (_activeShift is not null) return;
         
+        var lastEntry = _shifts.OrderBy(shift => shift.Id).FirstOrDefault();
+        var id = lastEntry is null ? 0 : lastEntry.Id + 1;
         var shift = new Shift()
         {
+            Id = id,
             Date = DateTime.Today,
             ShiftStart = DateTime.Now.TimeOfDay,
             Active = true
@@ -85,6 +93,14 @@ public class ShiftManager
         _shifts.Add(_activeShift);
         _activeShift = null;
         
+        await SaveData();
+    }
+
+    public async Task RemoveShift(int id)
+    {
+        var toRemove = _shifts?.FirstOrDefault(shift => shift.Id == id);
+        if (toRemove is null) return;
+        _shifts?.Remove(toRemove);
         await SaveData();
     }
 }
