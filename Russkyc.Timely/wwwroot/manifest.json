@@ -1,0 +1,40 @@
+{
+  "name": "Timely Time Tracker",
+  "short_name": "Timely",
+  "id": "./",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#19787c",
+  "display_override": [
+    "standalone",
+    "fullscreen"
+  ],
+  "icons": [
+      {
+        "src": "icons/512.png",
+        "type": "image/png",
+        "sizes": "512x512"
+      },
+      {
+        "src": "icons/256.png",
+        "type": "image/png",
+        "sizes": "256x256"
+      },
+      {
+        "src": "icons/192.png",
+        "type": "image/png",
+        "sizes": "192x192"
+      },
+      {
+        "src": "icons/128.png",
+        "type": "image/png",
+        "sizes": "128x128"
+      },
+      {
+        "src": "icons/64.png",
+        "type": "image/png",
+        "sizes": "64x64"
+      }
+    ]
+}
