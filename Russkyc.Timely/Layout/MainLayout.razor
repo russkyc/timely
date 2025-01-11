@@ -1,0 +1,44 @@
+﻿@using Russkyc.Timely.Pages
+@using Russkyc.Timely.Utilities
+@inherits LayoutComponentBase
+
+<MudThemeProvider Theme="@AppTheme.BaseTheme" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudTabs TabHeaderClass="m-6 rounded-lg" Color="Color.Primary" Outlined="false" MinimumTabWidth="90px" Class="grow" PanelClass="p-6 grow flex flex-col" Position="Position.Bottom" Elevation="0" Centered="true">
+    <MudTabPanel>
+        <TabContent>
+            <MudStack Spacing="0" Class="flex flex-col">
+                <MudIcon Size="Size.Medium" Class="mx-auto" Icon="@Icons.Material.Rounded.Home"/>
+                <MudText Class="mx-auto font-medium">Home</MudText>
+            </MudStack>
+        </TabContent>
+        <ChildContent>
+            <Home/>
+        </ChildContent>
+    </MudTabPanel>
+    <MudTabPanel>
+        <TabContent>
+            <MudStack Spacing="0" Class="flex flex-col">
+                <MudIcon Size="Size.Medium" Class="mx-auto" Icon="@Icons.Material.Rounded.List"/>
+                <MudText Class="mx-auto font-medium">Records</MudText>
+            </MudStack>
+        </TabContent>
+        <ChildContent>
+            <Records/>
+        </ChildContent>
+    </MudTabPanel>
+    <MudTabPanel>
+        <TabContent>
+            <MudStack Spacing="0" Class="flex flex-col">
+                <MudIcon Size="Size.Medium" Class="mx-auto" Icon="@Icons.Material.Rounded.Settings"/>
+                <MudText Class="mx-auto font-medium">Settings</MudText>
+            </MudStack>
+        </TabContent>
+        <ChildContent>
+            <Settings/>
+        </ChildContent>
+    </MudTabPanel>
+</MudTabs>

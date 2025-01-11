@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Russkyc.Timely</title>
+    <base href="/"/>
+    <link rel="stylesheet" href="css/app.css"/>
+    <link href="Russkyc.Timely.styles.css" rel="stylesheet"/>
+    <link href="manifest.webmanifest" rel="manifest"/>
+    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png"/>
+    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png"/>
+    <!-- Mudblazor -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet"/>
+    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet"/>
+    <!-- Tailwind CDN -->
+    <script src="js/tailwind.cdn.js"></script>
+</head>
+
+<body>
+<div id="app" class="flex flex-col min-h-dvh">
+    <div class="flex grow h-full w-full bg-[#19787c] flex-col text-white">
+        <div class="flex flex-col m-auto space-y-2">
+            <p class="mx-auto font-bold text-4xl">Timely</p>
+            <p class="mx-auto opacity-50">Time Tracker</p>
+        </div>
+        <p class="mx-auto opacity-50 bottom-0 mb-6">by @russkyc</p>
+    </div>
+</div>
+
+<div id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div>
+<script src="_framework/blazor.webassembly.js"></script>
+<script src="_content/MudBlazor/MudBlazor.min.js"></script>
+<script src="_content/Bit.Besql/bit-besql.js"></script>
+<script>navigator.serviceWorker.register('service-worker.js');</script>
+</body>
+
+</html>
