@@ -1,18 +1,22 @@
 ﻿@page "/"
+@using Blazored.LocalStorage
+@using Microsoft.EntityFrameworkCore
+@using Russkyc.Timely.Models.Constants
+@using Russkyc.Timely.Services.Data
 
 <MudStack Spacing="6" Class="grow flex flex-col">
     <MudText Class="text-2xl font-black">Home</MudText>
     <MudPaper Elevation="1" Class="p-6 rounded-lg bg-[var(--mud-palette-primary)] text-white">
         <MudStack Row="true" Spacing="0" Class="flex flex-row">
             <MudStack Class="my-auto" Spacing="0">
-                <MudText Class="text-lg opacity-75">January 12, Monday</MudText>
-                <MudText Class="text-3xl font-medium">8:30 AM</MudText>
+                <MudText Class="text-lg opacity-75">@(_currentTimestamp.ToString("dddd, MMMM d"))</MudText>
+                <MudText Class="text-3xl font-medium">@(_currentTimestamp.ToString("hh:mm tt"))</MudText>
             </MudStack>
             <MudSpacer/>
             <MudPaper Class="rounded-lg p-2 bg-white w-20" Elevation="0">
                 <MudStack Class="my-auto flex flex-col" Spacing="0">
-                    <MudText Class="text-3xl mx-auto font-bold text-[var(--mud-palette-primary)]">12</MudText>
-                    <MudText Class="mx-auto font-bold text-lg text-[var(--mud-palette-primary)]">Jan</MudText>
+                    <MudText Class="text-3xl mx-auto font-bold text-[var(--mud-palette-primary)]">@(_currentTimestamp.ToString(" d"))</MudText>
+                    <MudText Class="mx-auto font-bold text-lg text-[var(--mud-palette-primary)]">@(_currentTimestamp.ToString("MMM"))</MudText>
                 </MudStack>
             </MudPaper>
         </MudStack>
@@ -24,21 +28,91 @@
                                      Color="Color.Primary" StrokeWidth="4" Min="0" Max="12" Value="7"/>
             </MudItem>
             <MudStack Class="flex flex-col" Spacing="0">
-                <MudText Class="text-6xl mx-auto font-black text-[var(--mud-palette-primary)]">07:00</MudText>
-                <MudText Class="text-lg mx-auto font-medium text-[var(--mud-palette-primary)] opacity-75">Started</MudText>
+                @if (!_clockedIn)
+                {
+                    <MudText Class="text-6xl mx-auto font-black text-[var(--mud-palette-primary)]">00:00</MudText>
+                }
+                else
+                {
+                    <MudText Class="text-6xl mx-auto font-black text-[var(--mud-palette-primary)]">
+                        @GetShiftElapsed()
+                    </MudText>
+                }
+                <MudText Class="text-lg mx-auto font-medium text-[var(--mud-palette-primary)] opacity-75">
+                    @(_clockedIn ? "Clocked in" : "Clocked out")
+                </MudText>
             </MudStack>
         </MudItem>
         <MudStack Spacing="2">
-            <MudButton DropShadow="false" Size="Size.Large" Color="Color.Primary" Variant="Variant.Filled">
-                <MudText Class="font-medium text-lg">Start Shift</MudText>
-            </MudButton>
-            <MudButton DropShadow="false" Size="Size.Large" Color="Color.Secondary" Variant="Variant.Filled">
-                <MudText Class="font-medium text-lg text-[var(--mud-palette-primary)]">End Shift</MudText>
-            </MudButton>
+            @if (!_clockedIn)
+            {
+                <MudButton OnClick="@StartShift" DropShadow="false" Size="Size.Large" Color="Color.Primary" Variant="Variant.Filled">
+                    <MudText Class="font-medium text-lg">Start Shift</MudText>
+                </MudButton>
+            }
+            else
+            {
+                <MudButton OnClick="@EndShift" DropShadow="false" Size="Size.Large" Color="Color.Secondary" Variant="Variant.Filled">
+                    <MudText Class="font-medium text-lg text-[var(--mud-palette-primary)]">End Shift</MudText>
+                </MudButton>
+            }
         </MudStack>
     </MudItem>
 </MudStack>
+<AdvancedTimer AutoStart="true" IsEnabled="true" IntervalInMilisec="5000" Occurring="@Times.Infinite()" OnIntervalElapsed="@(_ => OnTimerElapse())" />
+
+@inject ISyncLocalStorageService LocalStorage
+@inject IDbContextFactory<AppDbContext> DbContextFactory
 
 @code {
+    
+    private bool _clockedIn;
+    private DateTime _clockedInTimestamp;
+    private DateTime _currentTimestamp = DateTime.Now;
 
+    protected override async Task OnInitializedAsync()
+    {
+        if (LocalStorage.ContainKey(StringValues.ClockedInStoreId))
+        {
+            _clockedIn = LocalStorage.GetItem<bool>(StringValues.ClockedInStoreId);
+            await InvokeAsync(StateHasChanged);
+        }
+        if (LocalStorage.ContainKey(StringValues.ClockedInTimestampStoreId))
+        {
+            _clockedInTimestamp = LocalStorage.GetItem<DateTime>(StringValues.ClockedInTimestampStoreId);
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task OnTimerElapse()
+    {
+        _currentTimestamp = DateTime.Now;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private string GetShiftElapsed()
+    {
+        var shift = _currentTimestamp - _clockedInTimestamp;
+        var shiftElapsed = $"{shift.Hours:00}:{shift.Minutes:00}";
+        return shiftElapsed;
+    }
+
+    async Task StartShift()
+    {
+        _clockedIn = true;
+        _clockedInTimestamp = DateTime.Now;
+        LocalStorage.SetItem(StringValues.ClockedInStoreId, true);
+        LocalStorage.SetItem(StringValues.ClockedInTimestampStoreId, _clockedInTimestamp);
+        await OnTimerElapse();
+    }
+    
+    async Task EndShift()
+    {
+        _clockedIn = false;
+        _clockedInTimestamp = default;
+        LocalStorage.SetItem(StringValues.ClockedInStoreId, false);
+        LocalStorage.RemoveItem(StringValues.ClockedInTimestampStoreId);
+        await OnTimerElapse();
+    }
+    
 }

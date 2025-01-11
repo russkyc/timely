@@ -1,3 +1,4 @@
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -36,9 +37,9 @@ await app.RunAsync();
 
 static void ConfigureServices(IServiceCollection services, string baseAddress)
 {
-    
     services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(baseAddress) });
     services.AddMudServices();
+    services.AddBlazoredLocalStorageAsSingleton();
     services.AddBesqlDbContextFactory<AppDbContext>(options => options.UseSqlite("Data Source=timely.sqlite3"));
 
 }
