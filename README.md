@@ -1,7 +1,16 @@
 
-<h2 align="center">Timely - A Time Tracker Web Application with PWA Support</h2>
+<h2 align="center">Timely - A Time Tracker Web App (PWA)</h2>
 
-### :camera: Preview
+### Where to Find
 
-| <img src=".github/images/time-tracker.jpg"> | <img src=".github/images/time-records.jpg">  |
-|---------------------------------------------|---|
+Web Deployment: [Timely on Netlify](https://runtimely.netlify.app)
+
+### Preview
+
+| <img src=".github/images/splash.jpg">  | <img src=".github/images/home.jpg">     |
+|----------------------------------------|-----------------------------------------|
+| <img src=".github/images/records.jpg"> | <img src=".github/images/settings.jpg"> |
+
+### License
+
+This project is licensed under the GPLv3 
