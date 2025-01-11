@@ -6,12 +6,15 @@ using Russkyc.Timely;
 using Russkyc.Timely.Services.Data;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
-builder.RootComponents.Add<App>("#app");
-builder.RootComponents.Add<HeadOutlet>("head::after");
+// 👇 Add the condition that determine root components are 
+//    already registered via prerednered HTML contents.
+if (!builder.RootComponents.Any())
+{
+    builder.RootComponents.Add<App>("#app");
+    builder.RootComponents.Add<HeadOutlet>("head::after");
+}
 
-builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-builder.Services.AddMudServices();
-builder.Services.AddBesqlDbContextFactory<AppDbContext>(options => options.UseSqlite("Data Source=timely.sqlite3"));
+ConfigureServices(builder.Services, builder.HostEnvironment.BaseAddress);
 
 var app = builder.Build();
 
@@ -30,3 +33,12 @@ await using (var scope = app.Services.CreateAsyncScope())
 }
 
 await app.RunAsync();
+
+static void ConfigureServices(IServiceCollection services, string baseAddress)
+{
+    
+    services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(baseAddress) });
+    services.AddMudServices();
+    services.AddBesqlDbContextFactory<AppDbContext>(options => options.UseSqlite("Data Source=timely.sqlite3"));
+
+}
