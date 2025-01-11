@@ -39,7 +39,7 @@
                     </MudText>
                 }
                 <MudText Class="text-lg mx-auto font-medium text-[var(--mud-palette-primary)] opacity-75">
-                    @(_clockedIn ? "Clocked in" : "Clocked out")
+                    @(_clockedIn ? $"Clocked in at {_clockedInTimestamp:hh:mm tt}" : "Clocked out")
                 </MudText>
             </MudStack>
         </MudItem>
@@ -47,13 +47,13 @@
             @if (!_clockedIn)
             {
                 <MudButton OnClick="@StartShift" DropShadow="false" Size="Size.Large" Color="Color.Primary" Variant="Variant.Filled">
-                    <MudText Class="font-medium text-lg">Start Shift</MudText>
+                    <MudText Class="font-medium text-lg">Clock In</MudText>
                 </MudButton>
             }
             else
             {
                 <MudButton OnClick="@EndShift" DropShadow="false" Size="Size.Large" Color="Color.Secondary" Variant="Variant.Filled">
-                    <MudText Class="font-medium text-lg text-[var(--mud-palette-primary)]">End Shift</MudText>
+                    <MudText Class="font-medium text-lg text-[var(--mud-palette-primary)]">Clock Out</MudText>
                 </MudButton>
             }
         </MudStack>
