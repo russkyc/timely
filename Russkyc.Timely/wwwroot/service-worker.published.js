@@ -23,8 +23,11 @@ async function onInstall(event) {
     const assetsRequests = self.assetsManifest.assets
         .filter(asset => offlineAssetsInclude.some(pattern => pattern.test(asset.url)))
         .filter(asset => !offlineAssetsExclude.some(pattern => pattern.test(asset.url)))
-        .map(asset => new Request(asset.url, { integrity: asset.hash, cache: 'no-cache' }));
-    await caches.open(cacheName).then(cache => cache.addAll(assetsRequests));
+        .map(asset => new Request(asset.url, { integrity: asset.hash }));
+    await caches.open(cacheName).then(cache => {
+        return fetch('/offline')
+            .then(response => cache.put('/offline', new Response(response.body)));
+    });
 }
 
 async function onActivate(event) {
