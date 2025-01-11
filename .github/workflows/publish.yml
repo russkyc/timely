@@ -17,6 +17,9 @@ jobs:
         with:
           dotnet-version: 8.0.200
 
+      - name: Restore workloads
+        run: dotnet workload restore
+        
       - name: Restore packages
         run: dotnet restore
 
