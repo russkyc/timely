@@ -1,0 +1,36 @@
+@using Toolbelt.Blazor.PWA.Updater.Service
+
+@inject IPWAUpdaterService PwaUpdaterService
+@inject ISnackbar Snackbar
+
+@code {
+    
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            PwaUpdaterService.NextVersionIsWaiting += HasPwaUpdate;
+        }
+    }
+
+    private void HasPwaUpdate(object? sender, EventArgs e)
+    {
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+        Snackbar.Add("Update Available", Severity.Info, config =>
+        {
+            config.Action = "Install";
+            config.ActionVariant = Variant.Text;
+            config.ActionColor = Color.Primary;
+            config.RequireInteraction = true;
+            config.CloseAfterNavigation = false;
+            config.ShowCloseIcon = false;
+            config.Onclick = async _ =>
+            {
+                Console.WriteLine("Starting serviceworker update");
+                await PwaUpdaterService.SkipWaitingAsync();
+                Console.WriteLine("Serviceworker updated");
+            };
+        });
+    }
+
+}

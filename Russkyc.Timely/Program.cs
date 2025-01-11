@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
 using Russkyc.Timely;
 using Russkyc.Timely.Services.Data;
+using Toolbelt.Blazor.Extensions.DependencyInjection;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 // 👇 Add the condition that determine root components are 
@@ -38,6 +39,8 @@ await app.RunAsync();
 static void ConfigureServices(IServiceCollection services, string baseAddress)
 {
     services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(baseAddress) });
+
+    services.AddPWAUpdater();
     services.AddMudServices();
     services.AddBlazoredLocalStorageAsSingleton();
     services.AddBesqlDbContextFactory<AppDbContext>(options => options.UseSqlite("Data Source=timely.sqlite3"));
