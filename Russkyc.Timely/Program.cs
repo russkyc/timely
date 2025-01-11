@@ -10,7 +10,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 //    already registered via prerednered HTML contents.
 if (!builder.RootComponents.Any())
 {
-    builder.RootComponents.Add<App>("#app");
+    builder.RootComponents.Add<TimelyWebApp>("#app");
     builder.RootComponents.Add<HeadOutlet>("head::after");
 }
 
