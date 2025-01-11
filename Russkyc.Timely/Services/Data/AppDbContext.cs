@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Russkyc.Timely.Models;
+using Russkyc.Timely.Models.Entities;
 
 namespace Russkyc.Timely.Services.Data;
 

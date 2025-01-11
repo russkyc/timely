@@ -1,0 +1,65 @@
+<MudStack Spacing="6" Class="flex flex-col">
+    <MudText Class="text-3xl font-black">Records</MudText>
+    <MudPaper Elevation="1" Class="rounded-lg bg-[var(--mud-palette-primary)] text-white">
+        <MudStack Row="true" Spacing="0" Class="flex flex-row">
+            <MudIconButton Size="Size.Large" Class="p-2 text-white" Icon="@Icons.Material.Rounded.ChevronLeft"/>
+            <MudSpacer/>
+            <MudText Class="text-xl my-auto">January</MudText>
+            <MudSpacer/>
+            <MudIconButton Size="Size.Large" Class="p-2 text-white" Icon="@Icons.Material.Rounded.ChevronRight"/>
+        </MudStack>
+    </MudPaper>
+    <MudItem Class="flex space-y-4 flex-col grow">
+        <MudGrid Spacing="4">
+            <MudItem xs="6">
+                <MudPaper Elevation="1" Class="p-4 rounded-lg bg-[var(--mud-palette-primary)] text-white">
+                    <MudStack Row="true" Spacing="0" Class="flex flex-row">
+                        <MudStack Class="my-auto" Spacing="0">
+                            <MudText Class="text-md opacity-75">Total Hours</MudText>
+                            <MudText Class="text-2xl font-medium">200</MudText>
+                        </MudStack>
+                        <MudSpacer/>
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="6">
+                <MudPaper Elevation="1" Class="p-4 rounded-lg bg-[var(--mud-palette-primary)] text-white">
+                    <MudStack Row="true" Spacing="0" Class="flex flex-row">
+                        <MudStack Class="my-auto" Spacing="0">
+                            <MudText Class="text-md opacity-75">Total Minutes</MudText>
+                            <MudText Class="text-2xl font-medium">32</MudText>
+                        </MudStack>
+                        <MudSpacer/>
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="6">
+                <MudPaper Elevation="1" Class="p-4 rounded-lg bg-[var(--mud-palette-primary)] text-white">
+                    <MudStack Row="true" Spacing="0" Class="flex flex-row">
+                        <MudStack Class="my-auto" Spacing="0">
+                            <MudText Class="text-md opacity-75">Undertime Hours</MudText>
+                            <MudText Class="text-2xl font-medium">5</MudText>
+                        </MudStack>
+                        <MudSpacer/>
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="6">
+                <MudPaper Elevation="1" Class="p-4 rounded-lg bg-[var(--mud-palette-primary)] text-white">
+                    <MudStack Row="true" Spacing="0" Class="flex flex-row">
+                        <MudStack Class="my-auto" Spacing="0">
+                            <MudText Class="text-md opacity-75">Undertime Minutes</MudText>
+                            <MudText Class="text-2xl font-medium">200</MudText>
+                        </MudStack>
+                        <MudSpacer/>
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    </MudItem>
+    <MudTextField Placeholder="Find.." Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Search" Variant="Variant.Outlined" T="string"/>
+</MudStack>
+
+@code {
+
+}
