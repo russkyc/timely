@@ -9,12 +9,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Bit.Besql" Version="9.2.1" />
+        <PackageReference Include="BlazorComponentBus" Version="2.2.0" />
         <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
+        <PackageReference Include="Magic.IndexedDb" Version="1.0.4" />
         <PackageReference Include="Majorsoft.Blazor.Components.Timer" Version="1.5.0" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.11"/>
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.11" PrivateAssets="all"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
         <PackageReference Include="MudBlazor" Version="7.15.0" />
         <PackageReference Include="Toolbelt.Blazor.PWA.Updater" Version="3.0.1" />
     </ItemGroup>

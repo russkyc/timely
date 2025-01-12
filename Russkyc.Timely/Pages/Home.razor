@@ -1,8 +1,11 @@
 ﻿@page "/"
+
+@using BlazorComponentBus
 @using Blazored.LocalStorage
-@using Microsoft.EntityFrameworkCore
+@using Magic.IndexedDb
 @using Russkyc.Timely.Models.Constants
-@using Russkyc.Timely.Services.Data
+@using Russkyc.Timely.Models.Entities
+@using Russkyc.Timely.Models.Events
 
 <MudStack Spacing="4" Class="grow flex flex-col">
     <MudText Class="text-2xl font-black">Home</MudText>
@@ -23,14 +26,27 @@
     </MudPaper>
     <MudItem Class="flex space-y-4 flex-col grow">
         <MudItem Class="m-auto flex flex-col space-y-4">
-            <MudItem Class="mx-auto">
-                <MudProgressCircular Size="Size.Small" Style="width: 160px; height: 160px;" Class="relative m-auto"
-                                     Color="Color.Primary" StrokeWidth="4" Min="0" Max="12" Value="7"/>
-            </MudItem>
+            @if (_clockedIn)
+            {
+                <MudItem Class="mx-auto">
+                    <MudProgressCircular Size="Size.Small" Style="width: 160px; height: 160px;" Class="relative m-auto"
+                                         Color="Color.Primary" StrokeWidth="4" Min="0" Max="12" Value="@GetShiftElapsedValue()"/>
+                </MudItem>
+            }
             <MudStack Class="flex flex-col" Spacing="0">
                 @if (!_clockedIn)
                 {
-                    <MudText Class="text-6xl mx-auto font-black text-[var(--mud-palette-primary)]">00:00</MudText>
+                    if (_canClockIn)
+                    {
+                        <MudText Class="text-6xl mx-auto font-black text-[var(--mud-palette-primary)]">- - : - -</MudText>
+                    }
+                    else
+                    {
+                        if (_currentShift is not null)
+                        {
+                            <MudText Class="text-6xl mx-auto font-black text-[var(--mud-palette-primary)]">@($"{_currentShift.GetWorkHours():00}:{_currentShift.GetWorkMinutes():00}")</MudText>
+                        }
+                    }
                 }
                 else
                 {
@@ -38,17 +54,29 @@
                         @GetShiftElapsed()
                     </MudText>
                 }
-                <MudText Class="text-lg mx-auto font-medium text-[var(--mud-palette-primary)] opacity-75">
-                    @(_clockedIn ? $"Clocked in at {_clockedInTimestamp:hh:mm tt}" : "Clocked out")
-                </MudText>
+                @if (_canClockIn)
+                {
+                    <MudText Class="text-lg mx-auto font-medium text-[var(--mud-palette-primary)] opacity-75">
+                        @(_clockedIn ? $"Clocked in at {_clockedInTimestamp:hh:mm tt}" : "Clocked out")
+                    </MudText>
+                }
+                else
+                {
+                    <MudText Class="text-lg mx-auto font-medium text-[var(--mud-palette-primary)] opacity-75">
+                        Shift Completed
+                    </MudText>
+                }
             </MudStack>
         </MudItem>
         <MudStack Spacing="2">
             @if (!_clockedIn)
             {
-                <MudButton OnClick="@StartShift" DropShadow="false" Size="Size.Large" Color="Color.Primary" Variant="Variant.Filled">
-                    <MudText Class="font-medium text-lg">Clock In</MudText>
-                </MudButton>
+                if (_canClockIn)
+                {
+                    <MudButton OnClick="@StartShift" DropShadow="false" Size="Size.Large" Color="Color.Primary" Variant="Variant.Filled">
+                        <MudText Class="font-medium text-lg">Clock In</MudText>
+                    </MudButton>
+                }
             }
             else
             {
@@ -59,22 +87,27 @@
         </MudStack>
     </MudItem>
 </MudStack>
-<AdvancedTimer AutoStart="true" IsEnabled="true" IntervalInMilisec="5000" Occurring="@Times.Infinite()" OnIntervalElapsed="@(_ => OnTimerElapse())" />
+<AdvancedTimer AutoStart="true" IsEnabled="true" IntervalInMilisec="1000" Occurring="@Times.Infinite()" OnIntervalElapsed="@(_ => OnTimerElapse())" />
 
+@inject ComponentBus Bus
 @inject ISyncLocalStorageService LocalStorage
-@inject IDbContextFactory<AppDbContext> DbContextFactory
 
 @code {
     
     private bool _clockedIn;
+    private bool _canClockIn;
+    private TimeEntry? _currentShift;
     private DateTime _clockedInTimestamp;
     private DateTime _currentTimestamp = DateTime.Now;
-
+    
+    [CascadingParameter] IndexedDbManager IndexedDbManager { get; set; }
+    
     protected override async Task OnInitializedAsync()
     {
         if (LocalStorage.ContainKey(StringValues.ClockedInStoreId))
         {
             _clockedIn = LocalStorage.GetItem<bool>(StringValues.ClockedInStoreId);
+            await Bus.Publish(new SetClockedInEvent(_clockedIn));
             await InvokeAsync(StateHasChanged);
         }
         if (LocalStorage.ContainKey(StringValues.ClockedInTimestampStoreId))
@@ -82,11 +115,53 @@
             _clockedInTimestamp = LocalStorage.GetItem<DateTime>(StringValues.ClockedInTimestampStoreId);
             await InvokeAsync(StateHasChanged);
         }
+        
+        Bus.Subscribe<ClearedDataEvent>(OnDataClearedHandler);
+
+        await OnTimerElapse();
+        await GetCanClockIn();
+    }
+
+    private async Task OnDataClearedHandler(MessageArgs message, CancellationToken token)
+    {
+        await OnTimerElapse();
+        await GetCanClockIn();
     }
 
     private async Task OnTimerElapse()
     {
         _currentTimestamp = DateTime.Now;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    async Task GetCanClockIn()
+    {
+        var entryId = $"{_currentTimestamp:MMddyy}";
+        var timeEntry = await IndexedDbManager.GetById<TimeEntry>(entryId);
+
+        if (timeEntry is null)
+        {
+            _canClockIn = true;
+            await InvokeAsync(StateHasChanged);
+            return;
+        }
+        
+        if (IsAm(_currentTimestamp) && timeEntry.AmIn == default)
+        {
+            _canClockIn = true;
+            await InvokeAsync(StateHasChanged);
+            return;
+        }
+        
+        if (!IsAm(_currentTimestamp) && timeEntry.PmIn == default)
+        {
+            _canClockIn = true;
+            await InvokeAsync(StateHasChanged);
+            return;
+        }
+        
+        _canClockIn = false;
+        _currentShift = timeEntry;
         await InvokeAsync(StateHasChanged);
     }
 
@@ -96,23 +171,121 @@
         var shiftElapsed = $"{shift.Hours:00}:{shift.Minutes:00}";
         return shiftElapsed;
     }
+    
+    private double GetShiftElapsedValue()
+    {
+        var shift = _currentTimestamp - _clockedInTimestamp;
+        return shift.TotalHours;
+    }
 
     async Task StartShift()
     {
         _clockedIn = true;
         _clockedInTimestamp = DateTime.Now;
+        
+        await Bus.Publish(new SetClockedInEvent(_clockedIn));
+
+        var entryId = $"{_clockedInTimestamp:MMddyy}";
+        
+        var timeEntry = await IndexedDbManager.GetById<TimeEntry>(entryId);
+        if (timeEntry is not null)
+        {
+            if (IsAm(_clockedInTimestamp))
+            {
+                timeEntry.AmIn = _clockedInTimestamp;
+            }
+            else
+            {
+                timeEntry.PmIn = _clockedInTimestamp;
+            }
+
+            await IndexedDbManager.Update(timeEntry);
+        }
+        else
+        {
+            timeEntry = new TimeEntry()
+            {
+                Id = entryId,
+                Day = _clockedInTimestamp.Day,
+                Month = _clockedInTimestamp.Month,
+                Year = _clockedInTimestamp.Year
+            };
+            
+            if (IsAm(_clockedInTimestamp))
+            {
+                timeEntry.AmIn = _clockedInTimestamp;
+            }
+            else
+            {
+                timeEntry.PmIn = _clockedInTimestamp;
+            }
+
+            await IndexedDbManager.Add(timeEntry);
+        }
+        
         LocalStorage.SetItem(StringValues.ClockedInStoreId, true);
         LocalStorage.SetItem(StringValues.ClockedInTimestampStoreId, _clockedInTimestamp);
+        
+        await Bus.Publish(new UpdateRecordsEvent());
+        
         await OnTimerElapse();
+    }
+
+    bool IsAm(DateTime time)
+    {
+        return $"{time:tt}".Equals("AM");
     }
     
     async Task EndShift()
     {
+        var entryId = $"{_clockedInTimestamp:MMddyy}";
+        var clockOutTimestamp = DateTime.Now;
+        
+        var timeEntry = await IndexedDbManager.GetById<TimeEntry>(entryId);
+        if (timeEntry is not null)
+        {
+            if (IsAm(_clockedInTimestamp))
+            {
+                timeEntry.AmOut = clockOutTimestamp;
+            }
+            else
+            {
+                timeEntry.PmOut = clockOutTimestamp;
+            }
+
+            await IndexedDbManager.Update(timeEntry);
+        }
+        else
+        {
+            timeEntry = new TimeEntry()
+            {
+                Id = entryId
+            };
+            
+            if (IsAm(_clockedInTimestamp))
+            {
+                timeEntry.AmOut = clockOutTimestamp;
+            }
+            else
+            {
+                timeEntry.PmOut = clockOutTimestamp;
+            }
+
+            await IndexedDbManager.Add(timeEntry);
+        }
+        
         _clockedIn = false;
         _clockedInTimestamp = default;
+        
+        await Bus.Publish(new SetClockedInEvent(_clockedIn));
+        
         LocalStorage.SetItem(StringValues.ClockedInStoreId, false);
         LocalStorage.RemoveItem(StringValues.ClockedInTimestampStoreId);
+        
+        await Bus.Publish(new UpdateRecordsEvent());
+
         await OnTimerElapse();
+        await GetCanClockIn();
     }
     
 }

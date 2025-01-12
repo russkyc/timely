@@ -1,16 +1,24 @@
+@using BlazorComponentBus
+@using Magic.IndexedDb
+@using Russkyc.Timely.Models.Entities
+@using Russkyc.Timely.Models.Events
+
 <MudStack Spacing="4" Class="grow min-h-full flex flex-col">
     <MudText Class="text-2xl font-black">Records</MudText>
     <MudPaper Elevation="1" Class="rounded-lg bg-[var(--mud-palette-primary)] text-white">
         <MudStack Row="true" Spacing="0" Class="flex flex-row">
-            <MudIconButton Size="Size.Large" Class="p-2 text-white" Icon="@Icons.Material.Rounded.ChevronLeft"/>
+            <MudIconButton OnClick="@DecrementMonth" Size="Size.Large" Class="p-2 text-white"
+                           Icon="@Icons.Material.Rounded.ChevronLeft"/>
             <MudSpacer/>
-            <MudText Class="text-xl my-auto">January</MudText>
+            <MudText Class="text-xl my-auto">@(_currentTimestamp.ToString("MMMM"))</MudText>
             <MudSpacer/>
-            <MudIconButton Size="Size.Large" Class="p-2 text-white" Icon="@Icons.Material.Rounded.ChevronRight"/>
+            <MudIconButton OnClick="@IncrementMonth" Size="Size.Large" Class="p-2 text-white"
+                           Icon="@Icons.Material.Rounded.ChevronRight"/>
         </MudStack>
     </MudPaper>
     <MudItem Class="flex flex-col">
-        <MudButton OnClick="@ExpandSummary" DropShadow="false" Size="Size.Large" Color="Color.Primary" Variant="Variant.Text">
+        <MudButton OnClick="@ExpandSummary" DropShadow="false" Size="Size.Large" Color="Color.Primary"
+                   Variant="Variant.Text">
             @if (!_summaryExpanded)
             {
                 <MudText Class="font-medium">Show Timesheet Summary</MudText>
@@ -24,60 +32,62 @@
             <MudGrid Spacing="4" Class="mt-1">
                 <MudItem xs="6">
                     <MudPaper Elevation="1" Class="p-4 rounded-lg bg-[var(--mud-palette-primary)] text-white">
-                        <MudStack Row="true" Spacing="0" Class="flex flex-row">
-                            <MudStack Class="my-auto" Spacing="0">
-                                <MudText Class="opacity-75">Total Hours</MudText>
-                                <MudText Class="text-2xl font-medium">200</MudText>
-                            </MudStack>
-                            <MudSpacer/>
+                        <MudStack Class="my-auto" Spacing="0">
+                            <MudText Class="opacity-75">Total Hours</MudText>
+                            @if (GetTotalWorkHours() > 0)
+                            {
+                                <MudText Class="text-2xl font-medium">@GetTotalWorkHours().ToString("00")</MudText>
+                            }
+                            else
+                            {
+                                <MudText Class="text-2xl font-medium">- -</MudText>
+                            }
                         </MudStack>
                     </MudPaper>
                 </MudItem>
                 <MudItem xs="6">
                     <MudPaper Elevation="1" Class="p-4 rounded-lg bg-[var(--mud-palette-primary)] text-white">
-                        <MudStack Row="true" Spacing="0" Class="flex flex-row">
-                            <MudStack Class="my-auto" Spacing="0">
-                                <MudText Class="opacity-75">Total Minutes</MudText>
-                                <MudText Class="text-2xl font-medium">32</MudText>
-                            </MudStack>
-                            <MudSpacer/>
+                        <MudStack Class="my-auto" Spacing="0">
+                            <MudText Class="opacity-75">Total Minutes</MudText>
+                            @if (GetTotalWorkMinutes() > 0)
+                            {
+                                <MudText Class="text-2xl font-medium">@GetTotalWorkMinutes().ToString("00")</MudText>
+                            }
+                            else
+                            {
+                                <MudText Class="text-2xl font-medium">- -</MudText>
+                            }
                         </MudStack>
                     </MudPaper>
                 </MudItem>
                 <MudItem xs="6">
                     <MudPaper Elevation="1" Class="p-4 rounded-lg bg-[var(--mud-palette-primary)] text-white">
-                        <MudStack Row="true" Spacing="0" Class="flex flex-row">
-                            <MudStack Class="my-auto" Spacing="0">
-                                <MudText Class="opacity-75">Under Hours</MudText>
-                                <MudText Class="text-2xl font-medium">5</MudText>
-                            </MudStack>
-                            <MudSpacer/>
+                        <MudStack Class="my-auto" Spacing="0">
+                            <MudText Class="opacity-75">Under Hours</MudText>
+                            <MudText Class="text-2xl font-medium">- -</MudText>
                         </MudStack>
                     </MudPaper>
                 </MudItem>
                 <MudItem xs="6">
                     <MudPaper Elevation="1" Class="p-4 rounded-lg bg-[var(--mud-palette-primary)] text-white">
-                        <MudStack Row="true" Spacing="0" Class="flex flex-row">
-                            <MudStack Class="my-auto" Spacing="0">
-                                <MudText Class="text-md opacity-75">Under Minutes</MudText>
-                                <MudText Class="text-2xl font-medium">200</MudText>
-                            </MudStack>
-                            <MudSpacer/>
+                        <MudStack Class="my-auto" Spacing="0">
+                            <MudText Class="text-md opacity-75">Under Minutes</MudText>
+                            <MudText Class="text-2xl font-medium">- -</MudText>
                         </MudStack>
                     </MudPaper>
                 </MudItem>
             </MudGrid>
         </MudCollapse>
     </MudItem>
-    <MudText Class="text-2xl font-black">Timesheet</MudText>
+    <MudText Class="text-xl font-medium">Timesheet</MudText>
     <MudItem Class="grow h-0 min-h-full overflow-y-auto">
         <MudStack Spacing="3">
-            @for (var day = 1; day <= 31; day++)
+            @foreach (var timeEntry in _timeEntries)
             {
-                var calendarDay = day;
                 <MudPaper Class="p-3 border flex space-x-3" Elevation="0">
-                    <MudPaper Class="shrink-0 flex p-0 bg-[var(--mud-palette-primary)] text-white w-12 h-12" Elevation="0">
-                        <MudText Class="text-lg font-bold m-auto">@calendarDay</MudText>
+                    <MudPaper Class="shrink-0 flex p-0 bg-[var(--mud-palette-primary)] text-white w-12 h-12"
+                              Elevation="0">
+                        <MudText Class="text-lg font-bold m-auto">@timeEntry.Day</MudText>
                     </MudPaper>
                     <MudStack Spacing="1" Class="flex flex-col grow">
                         <MudItem Class="grow">
@@ -99,10 +109,24 @@
                                     <MudText Class="mx-auto">AM</MudText>
                                 </MudItem>
                                 <MudItem xs="4" Class="flex">
-                                    <MudText Class="mx-auto">- - : - -</MudText>
+                                    @if (timeEntry.AmIn == default)
+                                    {
+                                        <MudText Class="mx-auto">- - : - -</MudText>
+                                    }
+                                    else
+                                    {
+                                        <MudText Class="mx-auto">@timeEntry.AmIn.ToString("hh:mm")</MudText>
+                                    }
                                 </MudItem>
                                 <MudItem xs="4" Class="flex">
-                                    <MudText Class="mx-auto">- - : - -</MudText>
+                                    @if (timeEntry.AmOut == default)
+                                    {
+                                        <MudText Class="mx-auto">- - : - -</MudText>
+                                    }
+                                    else
+                                    {
+                                        <MudText Class="mx-auto">@timeEntry.AmOut.ToString("hh:mm")</MudText>
+                                    }
                                 </MudItem>
                             </MudGrid>
                         </MudItem>
@@ -112,10 +136,24 @@
                                     <MudText Class="mx-auto">PM</MudText>
                                 </MudItem>
                                 <MudItem xs="4" Class="flex">
-                                    <MudText Class="mx-auto">08:00</MudText>
+                                    @if (timeEntry.PmIn == default)
+                                    {
+                                        <MudText Class="mx-auto">- - : - -</MudText>
+                                    }
+                                    else
+                                    {
+                                        <MudText Class="mx-auto">@timeEntry.PmIn.ToString("hh:mm")</MudText>
+                                    }
                                 </MudItem>
                                 <MudItem xs="4" Class="flex">
-                                    <MudText Class="mx-auto">12:00</MudText>
+                                    @if (timeEntry.PmOut == default)
+                                    {
+                                        <MudText Class="mx-auto">- - : - -</MudText>
+                                    }
+                                    else
+                                    {
+                                        <MudText Class="mx-auto">@timeEntry.PmOut.ToString("hh:mm")</MudText>
+                                    }
                                 </MudItem>
                             </MudGrid>
                         </MudItem>
@@ -138,10 +176,24 @@
                                     <MudText Class="mx-auto">Shift</MudText>
                                 </MudItem>
                                 <MudItem xs="4" Class="flex">
-                                    <MudText Class="mx-auto">6</MudText>
+                                    @if (timeEntry.GetWorkHours() > 0)
+                                    {
+                                        <MudText Class="mx-auto">@timeEntry.GetWorkHours().ToString("00")</MudText>
+                                    }
+                                    else
+                                    {
+                                        <MudText Class="mx-auto">- -</MudText>
+                                    }
                                 </MudItem>
                                 <MudItem xs="4" Class="flex">
-                                    <MudText Class="mx-auto">45</MudText>
+                                    @if (timeEntry.GetWorkMinutes() > 0)
+                                    {
+                                        <MudText Class="mx-auto">@timeEntry.GetWorkMinutes().ToString("00")</MudText>
+                                    }
+                                    else
+                                    {
+                                        <MudText Class="mx-auto">- -</MudText>
+                                    }
                                 </MudItem>
                             </MudGrid>
                         </MudItem>
@@ -151,10 +203,10 @@
                                     <MudText Class="mx-auto">Under</MudText>
                                 </MudItem>
                                 <MudItem xs="4" Class="flex">
-                                    <MudText Class="mx-auto">1</MudText>
+                                    <MudText Class="mx-auto">- -</MudText>
                                 </MudItem>
                                 <MudItem xs="4" Class="flex">
-                                    <MudText Class="mx-auto">15</MudText>
+                                    <MudText Class="mx-auto">- -</MudText>
                                 </MudItem>
                             </MudGrid>
                         </MudItem>
@@ -165,11 +217,78 @@
     </MudItem>
 </MudStack>
 
+@inject ComponentBus Bus
+
 @code {
+
     private bool _summaryExpanded;
+    private DateTime _currentTimestamp;
+    private IEnumerable<TimeEntry> _timeEntries = [];
+
+    [CascadingParameter] IndexedDbManager IndexedDbManager { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _currentTimestamp = DateTime.Today;
+        
+        Bus.Subscribe<ClearedDataEvent>(OnDataClearedHandler);
+        Bus.Subscribe<UpdateRecordsEvent>(OnUpdateRecordsHandler);
+
+        await GetTimesheetRecords();
+    }
+
+    private async Task OnUpdateRecordsHandler(MessageArgs message, CancellationToken token)
+    {
+        await GetTimesheetRecords();
+    }
+
+    private async Task OnDataClearedHandler(MessageArgs message, CancellationToken token)
+    {
+        await GetTimesheetRecords();
+    }
+
+    async Task DecrementMonth()
+    {
+        if (_currentTimestamp.Month == 1) return;
+        _currentTimestamp = _currentTimestamp.AddMonths(-1);
+
+        await GetTimesheetRecords();
+    }
+
+    async Task IncrementMonth()
+    {
+        if (_currentTimestamp.Month == 12) return;
+        _currentTimestamp = _currentTimestamp.AddMonths(1);
+
+        await GetTimesheetRecords();
+    }
+
+    int GetTotalWorkHours()
+    {
+        if (!_timeEntries.Any()) return 0;
+        return _timeEntries.Sum(timeEntry => timeEntry.GetWorkHours());
+    }
     
-    async Task ExpandSummary()
+    int GetTotalWorkMinutes()
+    {
+        if (!_timeEntries.Any()) return 0;
+        return _timeEntries.Sum(timeEntry => timeEntry.GetWorkMinutes());
+    }
+
+    async Task GetTimesheetRecords()
+    {
+        var timeEntries = await IndexedDbManager.GetAll<TimeEntry>();
+
+        _timeEntries = timeEntries.Where(
+            timeEntry => timeEntry.Year == _currentTimestamp.Year
+                         && timeEntry.Month == _currentTimestamp.Month);
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    void ExpandSummary()
     {
         _summaryExpanded = !_summaryExpanded;
     }
+
 }

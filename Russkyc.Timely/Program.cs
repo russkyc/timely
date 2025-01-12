@@ -1,10 +1,13 @@
+using BlazorComponentBus;
 using Blazored.LocalStorage;
+using Magic.IndexedDb;
+using Magic.IndexedDb.Extensions;
+using Magic.IndexedDb.Helpers;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
 using Russkyc.Timely;
-using Russkyc.Timely.Services.Data;
+using Russkyc.Timely.Models.Constants;
 using Toolbelt.Blazor.Extensions.DependencyInjection;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -19,30 +22,24 @@ if (!builder.RootComponents.Any())
 ConfigureServices(builder.Services, builder.HostEnvironment.BaseAddress);
 
 var app = builder.Build();
-
-// To Create database and apply migrations
-await using (var scope = app.Services.CreateAsyncScope())
-{
-    await using var dbContext = await scope.ServiceProvider
-        .GetRequiredService<IDbContextFactory<AppDbContext>>()
-        .CreateDbContextAsync();
-
-#if DEBUG
-    dbContext.Database.EnsureDeleted();
-#endif
-
-    await dbContext.Database.EnsureCreatedAsync();
-}
-
 await app.RunAsync();
 
 static void ConfigureServices(IServiceCollection services, string baseAddress)
 {
     services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(baseAddress) });
-
+    
+    services.AddSingleton<ComponentBus>();
     services.AddPWAUpdater();
     services.AddMudServices();
     services.AddBlazoredLocalStorageAsSingleton();
-    services.AddBesqlDbContextFactory<AppDbContext>(options => options.UseSqlite("Data Source=timely.sqlite3"));
+    
+    var localEncryptionKey = "zQfTuWnZi8u7x!A%C*F-JaBdRlUkXp2l";
 
+    services.AddBlazorDB(options =>
+    {
+        options.Name = StringValues.IndexedDbStoreId;
+        options.Version = "1";
+        options.EncryptionKey = localEncryptionKey;
+        options.StoreSchemas = SchemaHelper.GetAllSchemas(StringValues.IndexedDbStoreId); // builds entire database schema for you based on attributes
+    });
 }
