@@ -36,7 +36,7 @@ public class TimeEntry
         }
         if (PmIn != default && PmOut != default)
         {
-            var pmShift = AmOut - AmIn;
+            var pmShift = PmOut - PmIn;
             workHours += pmShift.Hours;
         }
 
