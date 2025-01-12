@@ -1,6 +1,7 @@
 using Magic.IndexedDb;
 using Magic.IndexedDb.SchemaAnnotations;
 using Russkyc.Timely.Models.Constants;
+using Russkyc.Timely.Utilities;
 
 namespace Russkyc.Timely.Models.Entities;
 
@@ -31,12 +32,12 @@ public class TimeEntry
 
         if (AmIn != default && AmOut != default)
         {
-            var amShift = AmOut - AmIn;
+            var amShift = AmOut.CalculateDiffFrom(AmIn);
             workHours += amShift.Hours;
         }
         if (PmIn != default && PmOut != default)
         {
-            var pmShift = PmOut - PmIn;
+            var pmShift = PmOut.CalculateDiffFrom(PmIn);
             workHours += pmShift.Hours;
         }
 
@@ -50,12 +51,12 @@ public class TimeEntry
 
         if (AmIn != default && AmOut != default)
         {
-            var amShift = AmOut - AmIn;
+            var amShift = AmOut.CalculateDiffFrom(AmIn);
             workMinutes += amShift.Minutes;
         }
         if (PmIn != default && PmOut != default)
         {
-            var pmShift = PmOut - PmIn;
+            var pmShift = PmOut.CalculateDiffFrom(PmIn);
             workMinutes += pmShift.Minutes;
         }
 
