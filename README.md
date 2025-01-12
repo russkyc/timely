@@ -16,11 +16,19 @@ once installed. Everything works offline.
 - Online use (Mobile only site because it's optimized for phone use)
 - Offline support (Install as PWA, use offline without an internet connection.)
 
-### Preview
-
-| <img src=".github/images/splash.jpg">  | <img src=".github/images/timetracker.jpg"> |
-|----------------------------------------|--------------------------------------------|
-| <img src=".github/images/records.jpg"> | <img src=".github/images/settings.jpg">    |
+### Screenshots
+<table>
+  <tr>
+    <td><img src=".github/images/splash.jpg"></td>
+    <td><img src=".github/images/timetracker.jpg"></td>
+    <td><img src=".github/images/shift.jpg"></td>
+  </tr>
+  <tr>
+    <td><img src=".github/images/summary.jpg"></td>
+    <td><img src=".github/images/timesheet.jpg"></td>
+    <td><img src=".github/images/settings.jpg"></td>
+  </tr>
+</table>
 
 ### To Do
 - Prompt Dialogs
