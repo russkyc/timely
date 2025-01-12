@@ -6,6 +6,7 @@
 @using Russkyc.Timely.Models.Constants
 @using Russkyc.Timely.Models.Entities
 @using Russkyc.Timely.Models.Events
+@using Russkyc.Timely.Utilities
 
 <MudStack Spacing="4" Class="grow flex flex-col">
     <MudText Class="text-2xl font-black">Home</MudText>
@@ -168,14 +169,14 @@
 
     private string GetShiftElapsed()
     {
-        var shift = _currentTimestamp - _clockedInTimestamp;
+        var shift = _currentTimestamp.CalculateDiffFrom(_clockedInTimestamp);
         var shiftElapsed = $"{shift.Hours:00}:{shift.Minutes:00}";
         return shiftElapsed;
     }
     
     private double GetShiftElapsedValue()
     {
-        var shift = _currentTimestamp - _clockedInTimestamp;
+        var shift = _currentTimestamp.CalculateDiffFrom(_clockedInTimestamp);
         return shift.TotalHours;
     }
 

@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Russkyc.Timely", "Russkyc.Timely\Russkyc.Timely.csproj", "{88C79BF5-69BD-44EB-BC3C-E44A52FE0BE3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Russkyc.Timely.Tests", "Russkyc.Timely.Tests\Russkyc.Timely.Tests.csproj", "{D7DA2911-5F63-4AB8-B880-E7B0D41035D0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{88C79BF5-69BD-44EB-BC3C-E44A52FE0BE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{88C79BF5-69BD-44EB-BC3C-E44A52FE0BE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{88C79BF5-69BD-44EB-BC3C-E44A52FE0BE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7DA2911-5F63-4AB8-B880-E7B0D41035D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7DA2911-5F63-4AB8-B880-E7B0D41035D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7DA2911-5F63-4AB8-B880-E7B0D41035D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7DA2911-5F63-4AB8-B880-E7B0D41035D0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

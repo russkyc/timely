@@ -34,9 +34,9 @@
                     <MudPaper Elevation="1" Class="p-4 rounded-lg bg-[var(--mud-palette-primary)] text-white">
                         <MudStack Class="my-auto" Spacing="0">
                             <MudText Class="opacity-75">Total Hours</MudText>
-                            @if (GetTotalWorkHours() > 0)
+                            @if (GetTotalWorkHours().hours > 0)
                             {
-                                <MudText Class="text-2xl font-medium">@GetTotalWorkHours().ToString("00")</MudText>
+                                <MudText Class="text-2xl font-medium">@GetTotalWorkHours().hours.ToString("00")</MudText>
                             }
                             else
                             {
@@ -49,9 +49,9 @@
                     <MudPaper Elevation="1" Class="p-4 rounded-lg bg-[var(--mud-palette-primary)] text-white">
                         <MudStack Class="my-auto" Spacing="0">
                             <MudText Class="opacity-75">Total Minutes</MudText>
-                            @if (GetTotalWorkMinutes() > 0)
+                            @if (GetTotalWorkHours().minutes > 0)
                             {
-                                <MudText Class="text-2xl font-medium">@GetTotalWorkMinutes().ToString("00")</MudText>
+                                <MudText Class="text-2xl font-medium">@GetTotalWorkHours().minutes.ToString("00")</MudText>
                             }
                             else
                             {
@@ -263,18 +263,25 @@
         await GetTimesheetRecords();
     }
 
-    int GetTotalWorkHours()
+    (int hours, int minutes) GetTotalWorkHours()
     {
-        if (!_timeEntries.Any()) return 0;
-        return _timeEntries.Sum(timeEntry => timeEntry.GetWorkHours());
+        if (!_timeEntries.Any()) return (0,0);
+        
+        var workHours = _timeEntries.Sum(timeEntry => timeEntry.GetWorkHours());
+        var workMinutes = _timeEntries.Sum(timeEntry => timeEntry.GetWorkMinutes());
+
+        if (workMinutes > 59)
+        {
+            var hoursOverflow = workMinutes / 60;
+            workHours += hoursOverflow;
+
+            var minutesOverflow = workMinutes % 60;
+            workMinutes = minutesOverflow;
+        }
+
+        return (workHours, workMinutes);
     }
     
-    int GetTotalWorkMinutes()
-    {
-        if (!_timeEntries.Any()) return 0;
-        return _timeEntries.Sum(timeEntry => timeEntry.GetWorkMinutes());
-    }
-
     async Task GetTimesheetRecords()
     {
         var timeEntries = await IndexedDbManager.GetAll<TimeEntry>();
