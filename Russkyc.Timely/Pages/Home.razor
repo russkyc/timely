@@ -13,7 +13,7 @@
     <MudPaper Elevation="1" Class="p-6 rounded-lg bg-[var(--mud-palette-primary)] text-white">
         <MudStack Row="true" Spacing="0" Class="flex flex-row">
             <MudStack Class="my-auto" Spacing="0">
-                <MudText Class="text-lg opacity-75">@(_currentTimestamp.ToString("dddd, MMMM d"))</MudText>
+                <MudText Class="text-lg opacity-75">@(_currentTimestamp.ToString("ddd, MMMM d"))</MudText>
                 <MudText Class="text-3xl font-medium">@(_currentTimestamp.ToString("hh:mm tt"))</MudText>
             </MudStack>
             <MudSpacer/>
@@ -58,7 +58,7 @@
                 @if (_canClockIn)
                 {
                     <MudText Class="text-lg mx-auto font-medium text-[var(--mud-palette-primary)] opacity-75">
-                        @(_clockedIn ? $"Clocked in at {_clockedInTimestamp:hh:mm tt}" : "Clocked out")
+                        @(_clockedIn ? $"Clocked in {_clockedInTimestamp:hh:mm tt}" : "Clocked out")
                     </MudText>
                 }
                 else

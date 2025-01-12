@@ -31,7 +31,7 @@
         <MudCollapse @bind-Expanded="@_summaryExpanded">
             <MudGrid Spacing="4" Class="mt-1">
                 <MudItem xs="6">
-                    <MudPaper Elevation="1" Class="p-4 rounded-lg bg-[var(--mud-palette-primary)] text-white">
+                    <MudPaper Elevation="0" Class="p-4 rounded-lg bg-[var(--mud-palette-primary)] text-white">
                         <MudStack Class="my-auto" Spacing="0">
                             <MudText Class="opacity-75">Total Hours</MudText>
                             @if (GetTotalWorkHours().hours > 0)
@@ -46,7 +46,7 @@
                     </MudPaper>
                 </MudItem>
                 <MudItem xs="6">
-                    <MudPaper Elevation="1" Class="p-4 rounded-lg bg-[var(--mud-palette-primary)] text-white">
+                    <MudPaper Elevation="0" Class="p-4 rounded-lg bg-[var(--mud-palette-primary)] text-white">
                         <MudStack Class="my-auto" Spacing="0">
                             <MudText Class="opacity-75">Total Minutes</MudText>
                             @if (GetTotalWorkHours().minutes > 0)
@@ -61,7 +61,7 @@
                     </MudPaper>
                 </MudItem>
                 <MudItem xs="6">
-                    <MudPaper Elevation="1" Class="p-4 rounded-lg bg-[var(--mud-palette-primary)] text-white">
+                    <MudPaper Elevation="0" Class="p-4 rounded-lg bg-[var(--mud-palette-primary)] text-white">
                         <MudStack Class="my-auto" Spacing="0">
                             <MudText Class="opacity-75">Under Hours</MudText>
                             <MudText Class="text-2xl font-medium">- -</MudText>
@@ -69,7 +69,7 @@
                     </MudPaper>
                 </MudItem>
                 <MudItem xs="6">
-                    <MudPaper Elevation="1" Class="p-4 rounded-lg bg-[var(--mud-palette-primary)] text-white">
+                    <MudPaper Elevation="0" Class="p-4 rounded-lg bg-[var(--mud-palette-primary)] text-white">
                         <MudStack Class="my-auto" Spacing="0">
                             <MudText Class="text-md opacity-75">Under Minutes</MudText>
                             <MudText Class="text-2xl font-medium">- -</MudText>
