@@ -1,4 +1,4 @@
-<MudStack Spacing="6" Class="flex flex-col">
+<MudStack Spacing="4" Class="grow min-h-full flex flex-col">
     <MudText Class="text-2xl font-black">Records</MudText>
     <MudPaper Elevation="1" Class="rounded-lg bg-[var(--mud-palette-primary)] text-white">
         <MudStack Row="true" Spacing="0" Class="flex flex-row">
@@ -9,57 +9,167 @@
             <MudIconButton Size="Size.Large" Class="p-2 text-white" Icon="@Icons.Material.Rounded.ChevronRight"/>
         </MudStack>
     </MudPaper>
-    <MudItem Class="flex space-y-4 flex-col grow">
-        <MudGrid Spacing="4">
-            <MudItem xs="6">
-                <MudPaper Elevation="1" Class="p-4 rounded-lg bg-[var(--mud-palette-primary)] text-white">
-                    <MudStack Row="true" Spacing="0" Class="flex flex-row">
-                        <MudStack Class="my-auto" Spacing="0">
-                            <MudText Class="text-md opacity-75">Total Hours</MudText>
-                            <MudText Class="text-2xl font-medium">200</MudText>
+    <MudItem Class="flex flex-col">
+        <MudButton OnClick="@ExpandSummary" DropShadow="false" Size="Size.Large" Color="Color.Primary" Variant="Variant.Text">
+            @if (!_summaryExpanded)
+            {
+                <MudText Class="font-medium">Show Timesheet Summary</MudText>
+            }
+            else
+            {
+                <MudText Class="font-medium">Hide Timesheet Summary</MudText>
+            }
+        </MudButton>
+        <MudCollapse @bind-Expanded="@_summaryExpanded">
+            <MudGrid Spacing="4" Class="mt-1">
+                <MudItem xs="6">
+                    <MudPaper Elevation="1" Class="p-4 rounded-lg bg-[var(--mud-palette-primary)] text-white">
+                        <MudStack Row="true" Spacing="0" Class="flex flex-row">
+                            <MudStack Class="my-auto" Spacing="0">
+                                <MudText Class="opacity-75">Total Hours</MudText>
+                                <MudText Class="text-2xl font-medium">200</MudText>
+                            </MudStack>
+                            <MudSpacer/>
                         </MudStack>
-                        <MudSpacer/>
-                    </MudStack>
-                </MudPaper>
-            </MudItem>
-            <MudItem xs="6">
-                <MudPaper Elevation="1" Class="p-4 rounded-lg bg-[var(--mud-palette-primary)] text-white">
-                    <MudStack Row="true" Spacing="0" Class="flex flex-row">
-                        <MudStack Class="my-auto" Spacing="0">
-                            <MudText Class="text-md opacity-75">Total Minutes</MudText>
-                            <MudText Class="text-2xl font-medium">32</MudText>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudPaper Elevation="1" Class="p-4 rounded-lg bg-[var(--mud-palette-primary)] text-white">
+                        <MudStack Row="true" Spacing="0" Class="flex flex-row">
+                            <MudStack Class="my-auto" Spacing="0">
+                                <MudText Class="opacity-75">Total Minutes</MudText>
+                                <MudText Class="text-2xl font-medium">32</MudText>
+                            </MudStack>
+                            <MudSpacer/>
                         </MudStack>
-                        <MudSpacer/>
-                    </MudStack>
-                </MudPaper>
-            </MudItem>
-            <MudItem xs="6">
-                <MudPaper Elevation="1" Class="p-4 rounded-lg bg-[var(--mud-palette-primary)] text-white">
-                    <MudStack Row="true" Spacing="0" Class="flex flex-row">
-                        <MudStack Class="my-auto" Spacing="0">
-                            <MudText Class="text-md opacity-75">Undertime Hours</MudText>
-                            <MudText Class="text-2xl font-medium">5</MudText>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudPaper Elevation="1" Class="p-4 rounded-lg bg-[var(--mud-palette-primary)] text-white">
+                        <MudStack Row="true" Spacing="0" Class="flex flex-row">
+                            <MudStack Class="my-auto" Spacing="0">
+                                <MudText Class="opacity-75">Under Hours</MudText>
+                                <MudText Class="text-2xl font-medium">5</MudText>
+                            </MudStack>
+                            <MudSpacer/>
                         </MudStack>
-                        <MudSpacer/>
-                    </MudStack>
-                </MudPaper>
-            </MudItem>
-            <MudItem xs="6">
-                <MudPaper Elevation="1" Class="p-4 rounded-lg bg-[var(--mud-palette-primary)] text-white">
-                    <MudStack Row="true" Spacing="0" Class="flex flex-row">
-                        <MudStack Class="my-auto" Spacing="0">
-                            <MudText Class="text-md opacity-75">Undertime Minutes</MudText>
-                            <MudText Class="text-2xl font-medium">200</MudText>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudPaper Elevation="1" Class="p-4 rounded-lg bg-[var(--mud-palette-primary)] text-white">
+                        <MudStack Row="true" Spacing="0" Class="flex flex-row">
+                            <MudStack Class="my-auto" Spacing="0">
+                                <MudText Class="text-md opacity-75">Under Minutes</MudText>
+                                <MudText Class="text-2xl font-medium">200</MudText>
+                            </MudStack>
+                            <MudSpacer/>
                         </MudStack>
-                        <MudSpacer/>
-                    </MudStack>
-                </MudPaper>
-            </MudItem>
-        </MudGrid>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        </MudCollapse>
     </MudItem>
-    <MudTextField Placeholder="Find.." Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Search" Variant="Variant.Outlined" T="string"/>
+    <MudText Class="text-2xl font-black">Timesheet</MudText>
+    <MudItem Class="grow h-0 min-h-full overflow-y-auto">
+        <MudStack Spacing="3">
+            @for (var day = 1; day <= 31; day++)
+            {
+                var calendarDay = day;
+                <MudPaper Class="p-3 border flex space-x-3" Elevation="0">
+                    <MudPaper Class="shrink-0 flex p-0 bg-[var(--mud-palette-primary)] text-white w-12 h-12" Elevation="0">
+                        <MudText Class="text-lg font-bold m-auto">@calendarDay</MudText>
+                    </MudPaper>
+                    <MudStack Spacing="1" Class="flex flex-col grow">
+                        <MudItem Class="grow">
+                            <MudGrid>
+                                <MudItem xs="4" Class="flex">
+                                    <MudText Class="mx-auto font-bold">Clock</MudText>
+                                </MudItem>
+                                <MudItem xs="4" Class="flex">
+                                    <MudText Class="mx-auto font-bold">In</MudText>
+                                </MudItem>
+                                <MudItem xs="4" Class="flex">
+                                    <MudText Class="mx-auto font-bold">Out</MudText>
+                                </MudItem>
+                            </MudGrid>
+                        </MudItem>
+                        <MudItem Class="grow">
+                            <MudGrid>
+                                <MudItem xs="4" Class="flex">
+                                    <MudText Class="mx-auto">AM</MudText>
+                                </MudItem>
+                                <MudItem xs="4" Class="flex">
+                                    <MudText Class="mx-auto">- - : - -</MudText>
+                                </MudItem>
+                                <MudItem xs="4" Class="flex">
+                                    <MudText Class="mx-auto">- - : - -</MudText>
+                                </MudItem>
+                            </MudGrid>
+                        </MudItem>
+                        <MudItem Class="grow">
+                            <MudGrid>
+                                <MudItem xs="4" Class="flex">
+                                    <MudText Class="mx-auto">PM</MudText>
+                                </MudItem>
+                                <MudItem xs="4" Class="flex">
+                                    <MudText Class="mx-auto">08:00</MudText>
+                                </MudItem>
+                                <MudItem xs="4" Class="flex">
+                                    <MudText Class="mx-auto">12:00</MudText>
+                                </MudItem>
+                            </MudGrid>
+                        </MudItem>
+                        <MudItem Class="grow mt-4">
+                            <MudGrid>
+                                <MudItem xs="4" Class="flex">
+                                    <MudText Class="mx-auto font-bold">Total</MudText>
+                                </MudItem>
+                                <MudItem xs="4" Class="flex">
+                                    <MudText Class="mx-auto font-bold">Hours</MudText>
+                                </MudItem>
+                                <MudItem xs="4" Class="flex">
+                                    <MudText Class="mx-auto font-bold">Minutes</MudText>
+                                </MudItem>
+                            </MudGrid>
+                        </MudItem>
+                        <MudItem Class="grow">
+                            <MudGrid>
+                                <MudItem xs="4" Class="flex">
+                                    <MudText Class="mx-auto">Shift</MudText>
+                                </MudItem>
+                                <MudItem xs="4" Class="flex">
+                                    <MudText Class="mx-auto">6</MudText>
+                                </MudItem>
+                                <MudItem xs="4" Class="flex">
+                                    <MudText Class="mx-auto">45</MudText>
+                                </MudItem>
+                            </MudGrid>
+                        </MudItem>
+                        <MudItem Class="grow">
+                            <MudGrid>
+                                <MudItem xs="4" Class="flex">
+                                    <MudText Class="mx-auto">Under</MudText>
+                                </MudItem>
+                                <MudItem xs="4" Class="flex">
+                                    <MudText Class="mx-auto">1</MudText>
+                                </MudItem>
+                                <MudItem xs="4" Class="flex">
+                                    <MudText Class="mx-auto">15</MudText>
+                                </MudItem>
+                            </MudGrid>
+                        </MudItem>
+                    </MudStack>
+                </MudPaper>
+            }
+        </MudStack>
+    </MudItem>
 </MudStack>
 
 @code {
-
+    private bool _summaryExpanded;
+    
+    async Task ExpandSummary()
+    {
+        _summaryExpanded = !_summaryExpanded;
+    }
 }
