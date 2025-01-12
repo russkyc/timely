@@ -146,14 +146,14 @@
             return;
         }
         
-        if (IsAm(_currentTimestamp) && timeEntry.AmIn == default)
+        if (IsAm(_currentTimestamp) && timeEntry.AmOut == default)
         {
             _canClockIn = true;
             await InvokeAsync(StateHasChanged);
             return;
         }
         
-        if (!IsAm(_currentTimestamp) && timeEntry.PmIn == default)
+        if (!IsAm(_currentTimestamp) && timeEntry.PmOut == default)
         {
             _canClockIn = true;
             await InvokeAsync(StateHasChanged);
