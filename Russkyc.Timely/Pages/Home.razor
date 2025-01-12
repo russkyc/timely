@@ -131,6 +131,7 @@
     private async Task OnTimerElapse()
     {
         _currentTimestamp = DateTime.Now;
+        await GetCanClockIn();
         await InvokeAsync(StateHasChanged);
     }
 
