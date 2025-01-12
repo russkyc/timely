@@ -1,0 +1,134 @@
+@using Russkyc.Timely.Models.Entities
+
+<MudPaper Class="p-3 border flex space-x-3" Elevation="0">
+    <MudPaper Class="shrink-0 flex p-0 bg-[var(--mud-palette-primary)] text-white w-12 h-12"
+              Elevation="0">
+        <MudText Class="text-lg font-bold m-auto">@TimeEntry.Day</MudText>
+    </MudPaper>
+    <MudStack Spacing="1" Class="flex flex-col grow">
+        <MudItem Class="grow">
+            <MudGrid>
+                <MudItem xs="4" Class="flex">
+                    <MudText Class="mx-auto font-bold">Clock</MudText>
+                </MudItem>
+                <MudItem xs="4" Class="flex">
+                    <MudText Class="mx-auto font-bold">In</MudText>
+                </MudItem>
+                <MudItem xs="4" Class="flex">
+                    <MudText Class="mx-auto font-bold">Out</MudText>
+                </MudItem>
+            </MudGrid>
+        </MudItem>
+        <MudItem Class="grow">
+            <MudGrid>
+                <MudItem xs="4" Class="flex">
+                    <MudText Class="mx-auto">AM</MudText>
+                </MudItem>
+                <MudItem xs="4" Class="flex">
+                    @if (TimeEntry.AmIn == default)
+                    {
+                        <MudText Class="mx-auto">- - : - -</MudText>
+                    }
+                    else
+                    {
+                        <MudText Class="mx-auto">@TimeEntry.AmIn.ToString("hh:mm")</MudText>
+                    }
+                </MudItem>
+                <MudItem xs="4" Class="flex">
+                    @if (TimeEntry.AmOut == default)
+                    {
+                        <MudText Class="mx-auto">- - : - -</MudText>
+                    }
+                    else
+                    {
+                        <MudText Class="mx-auto">@TimeEntry.AmOut.ToString("hh:mm")</MudText>
+                    }
+                </MudItem>
+            </MudGrid>
+        </MudItem>
+        <MudItem Class="grow">
+            <MudGrid>
+                <MudItem xs="4" Class="flex">
+                    <MudText Class="mx-auto">PM</MudText>
+                </MudItem>
+                <MudItem xs="4" Class="flex">
+                    @if (TimeEntry.PmIn == default)
+                    {
+                        <MudText Class="mx-auto">- - : - -</MudText>
+                    }
+                    else
+                    {
+                        <MudText Class="mx-auto">@TimeEntry.PmIn.ToString("hh:mm")</MudText>
+                    }
+                </MudItem>
+                <MudItem xs="4" Class="flex">
+                    @if (TimeEntry.PmOut == default)
+                    {
+                        <MudText Class="mx-auto">- - : - -</MudText>
+                    }
+                    else
+                    {
+                        <MudText Class="mx-auto">@TimeEntry.PmOut.ToString("hh:mm")</MudText>
+                    }
+                </MudItem>
+            </MudGrid>
+        </MudItem>
+        <MudItem Class="grow mt-4">
+            <MudGrid>
+                <MudItem xs="4" Class="flex">
+                    <MudText Class="mx-auto font-bold">Total</MudText>
+                </MudItem>
+                <MudItem xs="4" Class="flex">
+                    <MudText Class="mx-auto font-bold">Hours</MudText>
+                </MudItem>
+                <MudItem xs="4" Class="flex">
+                    <MudText Class="mx-auto font-bold">Minutes</MudText>
+                </MudItem>
+            </MudGrid>
+        </MudItem>
+        <MudItem Class="grow">
+            <MudGrid>
+                <MudItem xs="4" Class="flex">
+                    <MudText Class="mx-auto">Shift</MudText>
+                </MudItem>
+                <MudItem xs="4" Class="flex">
+                    @if (TimeEntry.GetWorkHours().hours > 0)
+                    {
+                        <MudText Class="mx-auto">@TimeEntry.GetWorkHours().hours.ToString("00")</MudText>
+                    }
+                    else
+                    {
+                        <MudText Class="mx-auto">- -</MudText>
+                    }
+                </MudItem>
+                <MudItem xs="4" Class="flex">
+                    @if (TimeEntry.GetWorkHours().minutes > 0)
+                    {
+                        <MudText Class="mx-auto">@TimeEntry.GetWorkHours().minutes.ToString("00")</MudText>
+                    }
+                    else
+                    {
+                        <MudText Class="mx-auto">- -</MudText>
+                    }
+                </MudItem>
+            </MudGrid>
+        </MudItem>
+        <MudItem Class="grow">
+            <MudGrid>
+                <MudItem xs="4" Class="flex">
+                    <MudText Class="mx-auto">Under</MudText>
+                </MudItem>
+                <MudItem xs="4" Class="flex">
+                    <MudText Class="mx-auto">- -</MudText>
+                </MudItem>
+                <MudItem xs="4" Class="flex">
+                    <MudText Class="mx-auto">- -</MudText>
+                </MudItem>
+            </MudGrid>
+        </MudItem>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter] public required TimeEntry TimeEntry { get; set; }
+}

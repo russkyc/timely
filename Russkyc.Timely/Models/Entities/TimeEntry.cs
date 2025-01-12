@@ -26,40 +26,34 @@ public class TimeEntry
     public DateTime PmOut { get; set; }
 
     [MagicNotMapped]
-    public int GetWorkHours()
+    public (int hours, int minutes) GetWorkHours()
     {
         var workHours = 0;
-
-        if (AmIn != default && AmOut != default)
-        {
-            var amShift = AmOut.CalculateDiffFrom(AmIn);
-            workHours += amShift.Hours;
-        }
-        if (PmIn != default && PmOut != default)
-        {
-            var pmShift = PmOut.CalculateDiffFrom(PmIn);
-            workHours += pmShift.Hours;
-        }
-
-        return workHours;
-    }
-    
-    [MagicNotMapped]
-    public int GetWorkMinutes()
-    {
         var workMinutes = 0;
 
         if (AmIn != default && AmOut != default)
         {
             var amShift = AmOut.CalculateDiffFrom(AmIn);
             workMinutes += amShift.Minutes;
+            workHours += amShift.Hours;
         }
         if (PmIn != default && PmOut != default)
         {
             var pmShift = PmOut.CalculateDiffFrom(PmIn);
             workMinutes += pmShift.Minutes;
+            workHours += pmShift.Hours;
         }
+        
+        if (workMinutes > 59)
+        {
+            var hoursOverflow = workMinutes / 60;
+            workHours += hoursOverflow;
 
-        return workMinutes;
+            var minutesOverflow = workMinutes % 60;
+            workMinutes = minutesOverflow;
+        }
+        
+        return (workHours, workMinutes);
     }
+    
 }

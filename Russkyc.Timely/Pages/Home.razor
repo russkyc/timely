@@ -45,7 +45,7 @@
                     {
                         if (_currentShift is not null)
                         {
-                            <MudText Class="text-6xl mx-auto font-black text-[var(--mud-palette-primary)]">@($"{_currentShift.GetWorkHours():00}:{_currentShift.GetWorkMinutes():00}")</MudText>
+                            <MudText Class="text-6xl mx-auto font-black text-[var(--mud-palette-primary)]">@($"{_currentShift.GetWorkHours().hours:00}:{_currentShift.GetWorkHours().minutes:00}")</MudText>
                         }
                     }
                 }
