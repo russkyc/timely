@@ -9,6 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="BlazorAnimation" Version="2.2.0" />
         <PackageReference Include="BlazorComponentBus" Version="2.2.0" />
         <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
         <PackageReference Include="Magic.IndexedDb" Version="1.0.4" />

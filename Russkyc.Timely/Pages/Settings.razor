@@ -93,7 +93,8 @@
                         <MudText Class="text-xl font-medium">@_storageEstimate.ToString("0.## MB")</MudText>
                     </MudStack>
                     <MudSpacer/>
-                    <MudButton Disabled="@(!_canClearData)" OnClick="@ClearData" Class="my-auto py-2" Size="Size.Small" DropShadow="false"
+                    <MudButton Disabled="@(!_canClearData)" OnClick="@ShowDeleteConfirmation" Class="my-auto py-2"
+                               Size="Size.Small" DropShadow="false"
                                Variant="Variant.Filled" Color="Color.Error">
                         <MudText>Clear Data</MudText>
                     </MudButton>
@@ -102,6 +103,38 @@
         </MudStack>
     </MudStack>
 </MudStack>
+<MudOverlay Class="flex flex-col p-2" Visible="@_showDeleteConfirmation" LightBackground="true">
+    <Animation Class="flex w-dvw h-dvh" Effect="@Effect.FadeInUp" Speed="@TimeSpan.FromMilliseconds(240)"
+               Delay="@Delay.None" Enabled="true">
+        <MudPaper Elevation="0" Class="rounded-lg mx-4 mt-auto mb-4 flex flex-col p-4 w-full h-96 border">
+            <MudStack Class="flex flex-col grow">
+                <MudItem Class="flex flex-col grow">
+                    <MudItem Class="flex flex-col grow">
+                        <MudStack Class="flex m-auto text-[var(--mud-palette-error)]" Spacing="4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                 stroke-linejoin="round" class="mx-auto lucide lucide-clipboard-x">
+                                <rect width="8" height="4" x="8" y="2" rx="1" ry="1"/>
+                                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                                <path d="m15 11-6 6"/>
+                                <path d="m9 11 6 6"/>
+                            </svg>
+                            <MudText Class="text-2xl font-medium">Delete all time record data?</MudText>
+                        </MudStack>
+                    </MudItem>
+                </MudItem>
+                <MudButton OnClick="@ClearData" FullWidth="true" DropShadow="false" Size="Size.Large"
+                           Color="Color.Error" Variant="Variant.Filled">
+                    <MudText Class="font-medium text-lg">Delete</MudText>
+                </MudButton>
+                <MudButton OnClick="@HideDeleteConfirmation" FullWidth="true" DropShadow="false" Size="Size.Large"
+                           Color="Color.Default" Variant="Variant.Text">
+                    <MudText Class="font-medium text-lg">Cancel</MudText>
+                </MudButton>
+            </MudStack>
+        </MudPaper>
+    </Animation>
+</MudOverlay>
 
 @inject ComponentBus Bus
 @inject ISyncLocalStorageService LocalStorage
@@ -111,13 +144,15 @@
     private bool _canClearData;
     private double _storageEstimate;
 
+    private bool _showDeleteConfirmation;
+
     [CascadingParameter] IndexedDbManager IndexedDbManager { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         var storageEstimate = await IndexedDbManager.GetStorageEstimateAsync();
         _storageEstimate = storageEstimate.usage;
-        
+
         if (LocalStorage.ContainKey(StringValues.ClockedInStoreId))
         {
             var clockedIn = LocalStorage.GetItem<bool>(StringValues.ClockedInStoreId);
@@ -127,10 +162,20 @@
         {
             _canClearData = true;
         }
-        
+
         Bus.Subscribe<SetClockedInEvent>(OnClockedInHandler);
 
         await InvokeAsync(StateHasChanged);
+    }
+
+    void ShowDeleteConfirmation()
+    {
+        _showDeleteConfirmation = true;
+    }
+
+    void HideDeleteConfirmation()
+    {
+        _showDeleteConfirmation = false;
     }
 
     private async Task OnClockedInHandler(MessageArgs message, CancellationToken token)
@@ -143,10 +188,15 @@
     async Task ClearData()
     {
         await IndexedDbManager.DeleteDbAsync(StringValues.IndexedDbStoreId);
-        
+
         await IndexedDbManager.OpenDb();
         await InvokeAsync(StateHasChanged);
         await Bus.Publish(new ClearedDataEvent());
+
+        if (_showDeleteConfirmation)
+        {
+            HideDeleteConfirmation();
+        }
     }
 
 }

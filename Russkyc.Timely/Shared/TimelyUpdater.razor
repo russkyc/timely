@@ -1,10 +1,41 @@
 @using Toolbelt.Blazor.PWA.Updater.Service
 
+<MudOverlay Class="flex flex-col p-2" Visible="@_showUpdatePrompt" LightBackground="true">
+    <Animation Class="flex w-dvw h-dvh" Effect="@Effect.FadeInUp" Speed="@TimeSpan.FromMilliseconds(240)"
+               Delay="@Delay.None" Enabled="true">
+        <MudPaper Elevation="0" Class="rounded-lg mx-4 mt-auto mb-4 flex flex-col p-4 w-full h-96 border">
+            <MudStack Class="flex flex-col grow">
+                <MudItem Class="flex flex-col grow">
+                    <MudItem Class="flex flex-col grow">
+                        <MudStack Class="flex flex-col m-auto text-[var(--mud-palette-primary)]" Spacing="4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                 stroke-linejoin="round" class="lucide lucide-circle-check mx-auto">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="m9 12 2 2 4-4"/>
+                            </svg>
+                            <MudText Class="text-xl text-center font-medium mx-6">Improvements are waiting, update now
+                                to continue using Timely.
+                            </MudText>
+                        </MudStack>
+                    </MudItem>
+                </MudItem>
+                <MudButton OnClick="@Update" FullWidth="true" DropShadow="false" Size="Size.Large"
+                           Color="Color.Primary" Variant="Variant.Filled">
+                    <MudText Class="font-medium text-lg">Update Now</MudText>
+                </MudButton>
+            </MudStack>
+        </MudPaper>
+    </Animation>
+</MudOverlay>
+
 @inject IPWAUpdaterService PwaUpdaterService
 @inject ISnackbar Snackbar
 
 @code {
-    
+
+    private bool _showUpdatePrompt;
+
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
@@ -13,24 +44,18 @@
         }
     }
 
+    async Task Update()
+    {
+        Console.WriteLine("Starting serviceworker update");
+        await PwaUpdaterService.SkipWaitingAsync();
+        Console.WriteLine("Serviceworker updated");
+
+        _showUpdatePrompt = false;
+    }
+
     private void HasPwaUpdate(object? sender, EventArgs e)
     {
-        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
-        Snackbar.Add("Update Available", Severity.Info, config =>
-        {
-            config.Action = "Install";
-            config.ActionVariant = Variant.Text;
-            config.ActionColor = Color.Primary;
-            config.RequireInteraction = true;
-            config.CloseAfterNavigation = false;
-            config.ShowCloseIcon = false;
-            config.Onclick = async _ =>
-            {
-                Console.WriteLine("Starting serviceworker update");
-                await PwaUpdaterService.SkipWaitingAsync();
-                Console.WriteLine("Serviceworker updated");
-            };
-        });
+        _showUpdatePrompt = true;
     }
 
 }
