@@ -10,7 +10,7 @@
             <MudIconButton OnClick="@DecrementMonth" Size="Size.Large" Class="p-2 text-white"
                            Icon="@Icons.Material.Rounded.ChevronLeft"/>
             <MudSpacer/>
-            <MudText Class="text-xl my-auto">@(_currentTimestamp.ToString("MMMM"))</MudText>
+            <MudText Class="text-xl my-auto font-bold">@(_currentTimestamp.ToString("MMMM"))</MudText>
             <MudSpacer/>
             <MudIconButton OnClick="@IncrementMonth" Size="Size.Large" Class="p-2 text-white"
                            Icon="@Icons.Material.Rounded.ChevronRight"/>
