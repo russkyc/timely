@@ -5,9 +5,13 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
-        <WasmBuildNative>true</WasmBuildNative>
     </PropertyGroup>
-
+    
+    <PropertyGroup>
+        <RunAOTCompilation>true</RunAOTCompilation>
+        <WasmStripILAfterAOT>true</WasmStripILAfterAOT>
+    </PropertyGroup>
+    
     <ItemGroup>
         <PackageReference Include="BlazorAnimation" Version="2.2.0" />
         <PackageReference Include="BlazorComponentBus" Version="2.2.0" />
