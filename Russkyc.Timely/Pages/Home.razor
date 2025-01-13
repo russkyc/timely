@@ -19,8 +19,10 @@
             <MudSpacer/>
             <MudPaper Class="rounded-lg p-2 bg-white w-20" Elevation="0">
                 <MudStack Class="my-auto flex flex-col" Spacing="0">
-                    <MudText Class="text-3xl mx-auto font-bold text-[var(--mud-palette-primary)]">@(_currentTimestamp.ToString(" d"))</MudText>
-                    <MudText Class="mx-auto font-bold text-lg text-[var(--mud-palette-primary)]">@(_currentTimestamp.ToString("MMM"))</MudText>
+                    <MudText
+                        Class="text-3xl mx-auto font-bold text-[var(--mud-palette-primary)]">@(_currentTimestamp.ToString(" d"))</MudText>
+                    <MudText
+                        Class="mx-auto font-bold text-lg text-[var(--mud-palette-primary)]">@(_currentTimestamp.ToString("MMM"))</MudText>
                 </MudStack>
             </MudPaper>
         </MudStack>
@@ -31,7 +33,8 @@
             {
                 <MudItem Class="mx-auto">
                     <MudProgressCircular Size="Size.Small" Style="width: 160px; height: 160px;" Class="relative m-auto"
-                                         Color="Color.Primary" StrokeWidth="4" Min="0" Max="8" Value="@GetShiftElapsedValue()"/>
+                                         Color="Color.Primary" StrokeWidth="4" Min="0" Max="8"
+                                         Value="@GetShiftElapsedValue()"/>
                 </MudItem>
             }
             <MudStack Class="flex flex-col" Spacing="0">
@@ -39,13 +42,15 @@
                 {
                     if (_canClockIn)
                     {
-                        <MudText Class="text-6xl mx-auto font-black text-[var(--mud-palette-primary)]">- - : - -</MudText>
+                        <MudText Class="text-6xl mx-auto font-black text-[var(--mud-palette-primary)]">- - : - -
+                        </MudText>
                     }
                     else
                     {
                         if (_currentShift is not null)
                         {
-                            <MudText Class="text-6xl mx-auto font-black text-[var(--mud-palette-primary)]">@($"{_currentShift.GetWorkHours().hours:00}:{_currentShift.GetWorkHours().minutes:00}")</MudText>
+                            <MudText
+                                Class="text-6xl mx-auto font-black text-[var(--mud-palette-primary)]">@($"{_currentShift.GetWorkHours().hours:00}:{_currentShift.GetWorkHours().minutes:00}")</MudText>
                         }
                     }
                 }
@@ -74,35 +79,101 @@
             {
                 if (_canClockIn)
                 {
-                    <MudButton OnClick="@StartShift" DropShadow="false" Size="Size.Large" Color="Color.Primary" Variant="Variant.Filled">
+                    <MudButton OnClick="@ShowClockInConfirmation" DropShadow="false" Size="Size.Large"
+                               Color="Color.Primary" Variant="Variant.Filled">
                         <MudText Class="font-medium text-lg">Clock In</MudText>
                     </MudButton>
                 }
             }
             else
             {
-                <MudButton OnClick="@EndShift" DropShadow="false" Size="Size.Large" Color="Color.Secondary" Variant="Variant.Filled">
-                    <MudText Class="font-medium text-lg text-[var(--mud-palette-primary)]">Clock Out</MudText>
+                <MudButton OnClick="@ShowClockOutConfirmation" DropShadow="false" Size="Size.Large"
+                           Color="Color.Primary" Variant="Variant.Filled">
+                    <MudText Class="font-medium text-lg text-white">Clock Out</MudText>
                 </MudButton>
             }
         </MudStack>
     </MudItem>
 </MudStack>
-<AdvancedTimer AutoStart="true" IsEnabled="true" IntervalInMilisec="1000" Occurring="@Times.Infinite()" OnIntervalElapsed="@(_ => OnTimerElapse())" />
+<MudOverlay Class="flex flex-col p-2" Visible="@_showClockInConfirmation" LightBackground="true">
+    <Animation Class="flex w-dvw h-dvh" Effect="@Effect.FadeInUp" Speed="@TimeSpan.FromMilliseconds(240)" Delay="@Delay.None" Enabled="true">
+        <MudPaper Elevation="0" Class="rounded-lg mx-4 mt-auto mb-4 flex flex-col p-4 w-full h-96 border">
+            <MudStack Class="flex flex-col grow">
+                <MudItem Class="flex flex-col grow">
+                    <MudStack Class="flex m-auto text-[var(--mud-palette-primary)]" Spacing="4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                             class="lucide lucide-timer mx-auto">
+                            <line x1="10" x2="14" y1="2" y2="2"/>
+                            <line x1="12" x2="15" y1="14" y2="11"/>
+                            <circle cx="12" cy="14" r="8"/>
+                        </svg>
+                        <MudText Class="text-2xl font-medium">Clock in and start shift?</MudText>
+                    </MudStack>
+                </MudItem>
+                <MudButton OnClick="@StartShift" FullWidth="true" DropShadow="false" Size="Size.Large"
+                           Color="Color.Primary" Variant="Variant.Filled">
+                    <MudText Class="font-medium text-lg">Clock In</MudText>
+                </MudButton>
+                <MudButton OnClick="@HideClockInConfirmation" FullWidth="true" DropShadow="false" Size="Size.Large"
+                           Color="Color.Primary" Variant="Variant.Text">
+                    <MudText Class="font-medium text-lg">Cancel</MudText>
+                </MudButton>
+            </MudStack>
+        </MudPaper>
+    </Animation>
+</MudOverlay>
+<MudOverlay Class="flex flex-col p-2" Visible="@_showClockOutConfirmation" LightBackground="true">
+    <Animation Class="flex w-dvw h-dvh" Effect="@Effect.FadeInUp" Speed="@TimeSpan.FromMilliseconds(240)" Delay="@Delay.None" Enabled="true">
+        <MudPaper Elevation="0" Class="rounded-lg mx-4 mt-auto mb-4 flex flex-col p-4 w-full h-96 border">
+            <MudStack Class="flex flex-col grow">
+                <MudItem Class="flex flex-col grow">
+                    <MudItem Class="flex flex-col grow">
+                        <MudStack Class="flex m-auto text-[var(--mud-palette-primary)]" Spacing="4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                 stroke-linejoin="round" class="lucide lucide-timer-off mx-auto">
+                                <path d="M10 2h4"/>
+                                <path d="M4.6 11a8 8 0 0 0 1.7 8.7 8 8 0 0 0 8.7 1.7"/>
+                                <path d="M7.4 7.4a8 8 0 0 1 10.3 1 8 8 0 0 1 .9 10.2"/>
+                                <path d="m2 2 20 20"/>
+                                <path d="M12 12v-2"/>
+                            </svg>
+                            <MudText Class="text-2xl font-medium">Clock out and stop shift?</MudText>
+                        </MudStack>
+                    </MudItem>
+                </MudItem>
+                <MudButton OnClick="@EndShift" FullWidth="true" DropShadow="false" Size="Size.Large"
+                           Color="Color.Primary" Variant="Variant.Filled">
+                    <MudText Class="font-medium text-lg">Clock Out</MudText>
+                </MudButton>
+                <MudButton OnClick="@HideClockOutConfirmation" FullWidth="true" DropShadow="false" Size="Size.Large"
+                           Color="Color.Primary" Variant="Variant.Text">
+                    <MudText Class="font-medium text-lg">Cancel</MudText>
+                </MudButton>
+            </MudStack>
+        </MudPaper>
+    </Animation>
+</MudOverlay>
+<AdvancedTimer AutoStart="true" IsEnabled="true" IntervalInMilisec="1000" Occurring="@Times.Infinite()"
+               OnIntervalElapsed="@(_ => OnTimerElapse())"/>
 
 @inject ComponentBus Bus
 @inject ISyncLocalStorageService LocalStorage
 
 @code {
-    
+
     private bool _clockedIn;
     private bool _canClockIn;
     private TimeEntry? _currentShift;
     private DateTime _clockedInTimestamp;
     private DateTime _currentTimestamp = DateTime.Now;
-    
+
+    private bool _showClockInConfirmation;
+    private bool _showClockOutConfirmation;
+
     [CascadingParameter] IndexedDbManager IndexedDbManager { get; set; }
-    
+
     protected override async Task OnInitializedAsync()
     {
         if (LocalStorage.ContainKey(StringValues.ClockedInStoreId))
@@ -111,16 +182,37 @@
             await Bus.Publish(new SetClockedInEvent(_clockedIn));
             await InvokeAsync(StateHasChanged);
         }
+
         if (LocalStorage.ContainKey(StringValues.ClockedInTimestampStoreId))
         {
             _clockedInTimestamp = LocalStorage.GetItem<DateTime>(StringValues.ClockedInTimestampStoreId);
             await InvokeAsync(StateHasChanged);
         }
-        
+
         Bus.Subscribe<ClearedDataEvent>(OnDataClearedHandler);
 
         await OnTimerElapse();
         await GetCanClockIn();
+    }
+
+    void ShowClockInConfirmation()
+    {
+        _showClockInConfirmation = true;
+    }
+
+    void HideClockInConfirmation()
+    {
+        _showClockInConfirmation = false;
+    }
+
+    void ShowClockOutConfirmation()
+    {
+        _showClockOutConfirmation = true;
+    }
+
+    void HideClockOutConfirmation()
+    {
+        _showClockOutConfirmation = false;
     }
 
     private async Task OnDataClearedHandler(MessageArgs message, CancellationToken token)
@@ -147,21 +239,21 @@
             await InvokeAsync(StateHasChanged);
             return;
         }
-        
+
         if (IsAm(_currentTimestamp) && timeEntry.AmOut == default)
         {
             _canClockIn = true;
             await InvokeAsync(StateHasChanged);
             return;
         }
-        
+
         if (!IsAm(_currentTimestamp) && timeEntry.PmOut == default)
         {
             _canClockIn = true;
             await InvokeAsync(StateHasChanged);
             return;
         }
-        
+
         _canClockIn = false;
         _currentShift = timeEntry;
         await InvokeAsync(StateHasChanged);
@@ -173,7 +265,7 @@
         var shiftElapsed = $"{shift.Hours:00}:{shift.Minutes:00}";
         return shiftElapsed;
     }
-    
+
     private double GetShiftElapsedValue()
     {
         var shift = _currentTimestamp.CalculateDiffFrom(_clockedInTimestamp);
@@ -184,11 +276,16 @@
     {
         _clockedIn = true;
         _clockedInTimestamp = DateTime.Now;
-        
+
+        if (_showClockInConfirmation)
+        {
+            HideClockInConfirmation();
+        }
+
         await Bus.Publish(new SetClockedInEvent(_clockedIn));
 
         var entryId = $"{_clockedInTimestamp:MMddyy}";
-        
+
         var timeEntry = await IndexedDbManager.GetById<TimeEntry>(entryId);
         if (timeEntry is not null)
         {
@@ -212,7 +309,7 @@
                 Month = _clockedInTimestamp.Month,
                 Year = _clockedInTimestamp.Year
             };
-            
+
             if (IsAm(_clockedInTimestamp))
             {
                 timeEntry.AmIn = _clockedInTimestamp;
@@ -224,12 +321,12 @@
 
             await IndexedDbManager.Add(timeEntry);
         }
-        
+
         LocalStorage.SetItem(StringValues.ClockedInStoreId, true);
         LocalStorage.SetItem(StringValues.ClockedInTimestampStoreId, _clockedInTimestamp);
-        
+
         await Bus.Publish(new UpdateRecordsEvent());
-        
+
         await OnTimerElapse();
     }
 
@@ -237,12 +334,17 @@
     {
         return $"{time:tt}".Equals("AM");
     }
-    
+
     async Task EndShift()
     {
         var entryId = $"{_clockedInTimestamp:MMddyy}";
         var clockOutTimestamp = DateTime.Now;
-        
+
+        if (_showClockOutConfirmation)
+        {
+            HideClockOutConfirmation();
+        }
+
         var timeEntry = await IndexedDbManager.GetById<TimeEntry>(entryId);
         if (timeEntry is not null)
         {
@@ -263,7 +365,7 @@
             {
                 Id = entryId
             };
-            
+
             if (IsAm(_clockedInTimestamp))
             {
                 timeEntry.AmOut = clockOutTimestamp;
@@ -275,19 +377,19 @@
 
             await IndexedDbManager.Add(timeEntry);
         }
-        
+
         _clockedIn = false;
         _clockedInTimestamp = default;
-        
+
         await Bus.Publish(new SetClockedInEvent(_clockedIn));
-        
+
         LocalStorage.SetItem(StringValues.ClockedInStoreId, false);
         LocalStorage.RemoveItem(StringValues.ClockedInTimestampStoreId);
-        
+
         await Bus.Publish(new UpdateRecordsEvent());
 
         await OnTimerElapse();
         await GetCanClockIn();
     }
-    
+
 }

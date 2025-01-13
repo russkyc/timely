@@ -31,7 +31,6 @@ once installed. Everything works offline.
 </table>
 
 ### To Do
-- Prompt Dialogs
 - Work hours configuration (To calculate under-time)
 
 ### Where to Find
