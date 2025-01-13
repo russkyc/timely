@@ -21,11 +21,11 @@
                    Variant="Variant.Text">
             @if (!_summaryExpanded)
             {
-                <MudText Class="font-medium">Show Timesheet Summary</MudText>
+                <MudText Class="font-medium text-center">Show Timesheet Summary</MudText>
             }
             else
             {
-                <MudText Class="font-medium">Hide Timesheet Summary</MudText>
+                <MudText Class="font-medium text-center">Hide Timesheet Summary</MudText>
             }
         </MudButton>
         <MudCollapse @bind-Expanded="@_summaryExpanded">
