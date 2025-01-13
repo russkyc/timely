@@ -9,7 +9,6 @@
     
     <PropertyGroup>
         <RunAOTCompilation>true</RunAOTCompilation>
-        <WasmStripILAfterAOT>true</WasmStripILAfterAOT>
     </PropertyGroup>
     
     <ItemGroup>
