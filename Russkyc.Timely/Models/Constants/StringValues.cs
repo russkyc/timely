@@ -3,11 +3,12 @@ namespace Russkyc.Timely.Models.Constants;
 public static class StringValues
 {
     // AppVersion
-    public const string AppVersion = "1.2.1 Stable";
+    public const string AppVersion = "1.2.2 Stable";
     
     // LocalStorage
     public const string ClockedInStoreId = "local_clocked_in";
     public const string ClockedInTimestampStoreId = "local_clocked_in_timestamp";
+    public const string ShowSecondsStoreId = "local_show_seconds";
 
     // IndexedDb
     public const string IndexedDbStoreId = "indexdb_timely";

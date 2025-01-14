@@ -30,6 +30,26 @@
                 </MudStack>
             </MudPaper>
         </MudStack>
+        <MudStack Spacing="3">
+            <MudText Class="text-xl font-medium">Display</MudText>
+            <MudPaper Elevation="0"Class="pb-4 pl-4 pt-4 rounded-lg border">
+                <MudStack Row="true" Spacing="0" Class="flex flex-row">
+                    <MudStack Class="my-auto" Spacing="0">
+                        <MudText Class="opacity-75">Timer Seconds</MudText>
+                        @if (_showTimerSeconds)
+                        {
+                            <MudText Class="text-xl font-medium">Shown</MudText>
+                        }
+                        else
+                        {
+                            <MudText Class="text-xl font-medium">Hidden</MudText>
+                        }
+                    </MudStack>
+                    <MudSpacer/>
+                    <MudSwitch Color="Color.Primary" T="bool" Value="@_showTimerSeconds" Ripple="false" Size="Size.Large" ValueChanged="@OnShowTimerSecondsChanged"/>
+                </MudStack>
+            </MudPaper>
+        </MudStack>
         @*<MudStack Spacing="3">
             <MudText Class="text-xl font-medium">Weekdays</MudText>
             <MudPaper Elevation="0" Class="p-4 rounded-lg border">
@@ -142,6 +162,7 @@
 @code {
 
     private bool _canClearData;
+    private bool _showTimerSeconds;
     private double _storageEstimate;
 
     private bool _showDeleteConfirmation;
@@ -161,6 +182,12 @@
         else
         {
             _canClearData = true;
+        }
+
+        if (LocalStorage.ContainKey(StringValues.ShowSecondsStoreId))
+        {
+            _showTimerSeconds = LocalStorage.GetItem<bool>(StringValues.ShowSecondsStoreId);
+            await InvokeAsync(StateHasChanged);
         }
 
         Bus.Subscribe<SetClockedInEvent>(OnClockedInHandler);
@@ -197,6 +224,13 @@
         {
             HideDeleteConfirmation();
         }
+    }
+
+    private async Task OnShowTimerSecondsChanged(bool show)
+    {
+        _showTimerSeconds = show;
+        LocalStorage.SetItem(StringValues.ShowSecondsStoreId, _showTimerSeconds);
+        await Bus.Publish(new SetShowTimerSecondsEvent(show));
     }
 
 }

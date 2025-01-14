@@ -42,8 +42,18 @@
                 {
                     if (_canClockIn)
                     {
-                        <MudText Class="text-6xl mx-auto font-black text-[var(--mud-palette-primary)]">- - : - -
-                        </MudText>
+                        if (_showTimerSeconds)
+                        {
+                            <MudText Class="text-6xl mx-auto font-black text-[var(--mud-palette-primary)]">
+                                - - : - - : - -
+                            </MudText>
+                        }
+                        else
+                        {
+                            <MudText Class="text-6xl mx-auto font-black text-[var(--mud-palette-primary)]">
+                                - - : - -
+                            </MudText>
+                        }
                     }
                     else
                     {
@@ -165,6 +175,8 @@
 
     private bool _clockedIn;
     private bool _canClockIn;
+    private bool _showTimerSeconds;
+    
     private TimeEntry? _currentShift;
     private DateTime _clockedInTimestamp;
     private DateTime _currentTimestamp = DateTime.Now;
@@ -189,7 +201,14 @@
             await InvokeAsync(StateHasChanged);
         }
 
+        if (LocalStorage.ContainKey(StringValues.ShowSecondsStoreId))
+        {
+            _showTimerSeconds = LocalStorage.GetItem<bool>(StringValues.ShowSecondsStoreId);
+            await InvokeAsync(StateHasChanged);
+        }
+
         Bus.Subscribe<ClearedDataEvent>(OnDataClearedHandler);
+        Bus.Subscribe<SetShowTimerSecondsEvent>(OnShowTimerSecondsHandler);
 
         await OnTimerElapse();
         await GetCanClockIn();
@@ -219,6 +238,13 @@
     {
         await OnTimerElapse();
         await GetCanClockIn();
+    }
+    
+    private async Task OnShowTimerSecondsHandler(MessageArgs message, CancellationToken ct)
+    {
+        var value = message.GetMessage<SetShowTimerSecondsEvent>();
+        _showTimerSeconds = value.Show;
+        await InvokeAsync(StateHasChanged);
     }
 
     private async Task OnTimerElapse()
@@ -262,8 +288,9 @@
     private string GetShiftElapsed()
     {
         var shift = _currentTimestamp.CalculateDiffFrom(_clockedInTimestamp);
-        var shiftElapsed = $"{shift.Hours:00}:{shift.Minutes:00}";
-        return shiftElapsed;
+        return _showTimerSeconds
+            ? $"{shift.Hours:00}:{shift.Minutes:00}:{shift.Seconds:00}"
+            : $"{shift.Hours:00}:{shift.Minutes:00}";
     }
 
     private double GetShiftElapsedValue()
