@@ -8,7 +8,6 @@
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
-<TimelyUpdater/>
 
 <CascadingValue Value="@IndexedDbManager">
     @if (IndexedDbManager is not null)
@@ -50,6 +49,7 @@
                     </ChildContent>
                 </MudTabPanel>
             </MudTabs>
+            <TimelyUpdater/>
         </MudHidden>
         <MudHidden Breakpoint="Breakpoint.MdAndDown">
             <MudItem Class="flex flex-col grow w-full">

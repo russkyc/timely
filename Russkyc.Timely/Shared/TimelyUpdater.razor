@@ -36,26 +36,21 @@
 
     private bool _showUpdatePrompt;
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override void OnInitialized()
     {
-        if (firstRender)
-        {
-            PwaUpdaterService.NextVersionIsWaiting += HasPwaUpdate;
-        }
+        PwaUpdaterService.NextVersionIsWaiting += HasPwaUpdate;
     }
 
     async Task Update()
     {
-        Console.WriteLine("Starting serviceworker update");
         await PwaUpdaterService.SkipWaitingAsync();
-        Console.WriteLine("Serviceworker updated");
-
         _showUpdatePrompt = false;
     }
 
     private void HasPwaUpdate(object? sender, EventArgs e)
     {
         _showUpdatePrompt = true;
+        StateHasChanged();
     }
 
 }
