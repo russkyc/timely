@@ -52,8 +52,36 @@
             </MudTabs>
         </MudHidden>
         <MudHidden Breakpoint="Breakpoint.MdAndDown">
-            <MudItem Class="grow flex flex-col">
-                <MudText Class="m-auto">Only available on mobile</MudText>
+            <MudItem Class="flex flex-col grow w-full">
+                <MudCard Elevation="0" Class="flex flex-col space-y-6 order p-8 w-min m-auto border">
+                    @if (!_showQrCode)
+                    {
+                        <MudImage Src="icons/progressive-app.svg" Class="w-5/6 mx-auto"/>
+                    }
+                    else
+                    {
+                        <MudImage Src="qr-code.svg" Class="w-10/12 mx-auto"/>
+                    }
+                    <MudStack Spacing="1">
+                        @if (!_showQrCode)
+                        {
+                            <MudText Class="text-xl font-bold text-center text-center wrap text-[var(--mud-palette-primary)] w-96">Please use Timely on a mobile device</MudText>
+                        }
+                        else
+                        {
+                            <MudText Class="text-xl font-bold text-center text-center wrap text-[var(--mud-palette-primary)] w-96">Scan to visit Timely on your phone</MudText>
+                        }
+                        <MudText Class="text-center text-center wrap">We are crafting an enjoyable desktop experience. For the meantime, please use timely on a mobile device.</MudText>
+                    </MudStack>
+                    @if (!_showQrCode)
+                    {
+                        <MudButton DropShadow="false" Size="Size.Large"
+                                   Color="Color.Primary" Variant="Variant.Filled"
+                                   OnClick="@ShowQrCode">
+                            <MudText Class="font-medium text-lg">Show QR</MudText>
+                        </MudButton>
+                    }
+                </MudCard>
             </MudItem>
         </MudHidden>
     </MudBreakpointProvider>
@@ -64,11 +92,18 @@
 
 @code
 {
+    private bool _showQrCode;
+    
     IndexedDbManager? IndexedDbManager;
 
     protected override async Task OnInitializedAsync()
     {
         IndexedDbManager = await MagicDb.GetDbManager(StringValues.IndexedDbStoreId);
         await InvokeAsync(StateHasChanged);
+    }
+
+    void ShowQrCode()
+    {
+        _showQrCode = true;
     }
 }
