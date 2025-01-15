@@ -1,11 +1,13 @@
 using BlazorComponentBus;
 using Blazored.LocalStorage;
+using FileDownloadBlazor.Extensions;
 using Magic.IndexedDb;
 using Magic.IndexedDb.Extensions;
 using Magic.IndexedDb.Helpers;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
+using QuestPDF.Infrastructure;
 using Russkyc.Timely;
 using Russkyc.Timely.Models.Constants;
 using Toolbelt.Blazor.Extensions.DependencyInjection;
@@ -20,6 +22,9 @@ if (!builder.RootComponents.Any())
 }
 
 ConfigureServices(builder.Services, builder.HostEnvironment.BaseAddress);
+
+// Set QuestPDF License
+QuestPDF.Settings.License = LicenseType.Community;
 
 var app = builder.Build();
 await app.RunAsync();
@@ -42,4 +47,6 @@ static void ConfigureServices(IServiceCollection services, string baseAddress)
         options.EncryptionKey = localEncryptionKey;
         options.StoreSchemas = SchemaHelper.GetAllSchemas(StringValues.IndexedDbStoreId); // builds entire database schema for you based on attributes
     });
+    
+    services.AddFileDownloadBlazor();
 }
