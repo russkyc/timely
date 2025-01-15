@@ -7,19 +7,21 @@
         <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
     </PropertyGroup>
     
-    <PropertyGroup>
-        <RunAOTCompilation>true</RunAOTCompilation>
-    </PropertyGroup>
-    
     <ItemGroup>
         <PackageReference Include="BlazorAnimation" Version="2.2.0" />
         <PackageReference Include="BlazorComponentBus" Version="2.2.0" />
         <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
+        <PackageReference Include="HarfBuzzSharp.NativeAssets.WebAssembly" Version="8.3.0.1" />
+        <NativeFileReference Include="$(HarfBuzzSharpStaticLibraryPath)/8.3.0.1/st/*.a" />
         <PackageReference Include="Magic.IndexedDb" Version="1.0.4" />
         <PackageReference Include="Majorsoft.Blazor.Components.Timer" Version="1.5.0" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.11"/>
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.11" PrivateAssets="all"/>
         <PackageReference Include="MudBlazor" Version="7.15.0" />
+        <PackageReference Include="QuestPDF" Version="2024.12.2" />
+        <PackageReference Include="SkiaSharp.HarfBuzz" Version="3.116.1" />
+        <PackageReference Include="SkiaSharp.NativeAssets.WebAssembly" Version="3.116.1" />
+        <PackageReference Include="SkiaSharp.Views.Blazor" Version="3.116.1" />
         <PackageReference Include="Toolbelt.Blazor.PWA.Updater" Version="3.0.1" />
     </ItemGroup>
 
