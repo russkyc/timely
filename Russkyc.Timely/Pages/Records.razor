@@ -1,7 +1,15 @@
 @using BlazorComponentBus
+@using Blazored.LocalStorage
+@using FileDownloadBlazor
 @using Magic.IndexedDb
+@using QuestPDF.Drawing
+@using QuestPDF.Fluent
+@using QuestPDF.Infrastructure
+@using Russkyc.Timely.Models.Constants
 @using Russkyc.Timely.Models.Entities
 @using Russkyc.Timely.Models.Events
+@using Russkyc.Timely.Utilities
+@using Size = MudBlazor.Size
 
 <MudStack Spacing="4" Class="grow min-h-full flex flex-col">
     <MudText Class="text-2xl font-black">Records</MudText>
@@ -36,7 +44,8 @@
                             <MudText Class="opacity-75">Total Hours</MudText>
                             @if (GetTotalWorkHours().hours > 0)
                             {
-                                <MudText Class="text-2xl font-medium">@GetTotalWorkHours().hours.ToString("00")</MudText>
+                                <MudText
+                                    Class="text-2xl font-medium">@GetTotalWorkHours().hours.ToString("00")</MudText>
                             }
                             else
                             {
@@ -51,7 +60,8 @@
                             <MudText Class="opacity-75">Total Minutes</MudText>
                             @if (GetTotalWorkHours().minutes > 0)
                             {
-                                <MudText Class="text-2xl font-medium">@GetTotalWorkHours().minutes.ToString("00")</MudText>
+                                <MudText
+                                    Class="text-2xl font-medium">@GetTotalWorkHours().minutes.ToString("00")</MudText>
                             }
                             else
                             {
@@ -76,6 +86,15 @@
                         </MudStack>
                     </MudPaper>
                 </MudItem>
+                @if (_timeEntries.Any() )
+                {
+                    <MudItem xs="12">
+                        <MudButton Disabled="@(!_canExport)" OnClick="@PrintTimesheet" DropShadow="false" Size="Size.Large"
+                                   Color="Color.Primary" Variant="Variant.Filled" FullWidth="true">
+                            <MudText Class="font-medium text-lg">Export DTR for @(_currentTimestamp.ToString("MMMM"))</MudText>
+                        </MudButton>
+                    </MudItem>
+                }
             </MudGrid>
         </MudCollapse>
     </MudItem>
@@ -91,9 +110,12 @@
 </MudStack>
 
 @inject ComponentBus Bus
+@inject IFileDownloader Downloader
+@inject ISyncLocalStorageService LocalStorage
 
 @code {
 
+    private bool _canExport;
     private bool _summaryExpanded;
     private DateTime _currentTimestamp;
     private IEnumerable<TimeEntry> _timeEntries = [];
@@ -103,11 +125,29 @@
     protected override async Task OnInitializedAsync()
     {
         _currentTimestamp = DateTime.Today;
-        
+
+        if (LocalStorage.ContainKey(StringValues.ClockedInStoreId))
+        {
+            var clockedIn = LocalStorage.GetItem<bool>(StringValues.ClockedInStoreId);
+            _canExport = !clockedIn;
+        }
+        else
+        {
+            _canExport = true;
+        }
+
+        Bus.Subscribe<SetClockedInEvent>(OnClockedInHandler);
         Bus.Subscribe<ClearedDataEvent>(OnDataClearedHandler);
         Bus.Subscribe<UpdateRecordsEvent>(OnUpdateRecordsHandler);
 
         await GetTimesheetRecords();
+    }
+
+    private async Task OnClockedInHandler(MessageArgs message, CancellationToken token)
+    {
+        var messageValue = message.GetMessage<SetClockedInEvent>();
+        _canExport = !messageValue.ClockedIn;
+        await InvokeAsync(StateHasChanged);
     }
 
     private async Task OnUpdateRecordsHandler(MessageArgs message, CancellationToken token)
@@ -138,8 +178,8 @@
 
     (int hours, int minutes) GetTotalWorkHours()
     {
-        if (!_timeEntries.Any()) return (0,0);
-        
+        if (!_timeEntries.Any()) return (0, 0);
+
         var workHours = _timeEntries.Sum(timeEntry => timeEntry.GetWorkHours().hours);
         var workMinutes = _timeEntries.Sum(timeEntry => timeEntry.GetWorkHours().minutes);
 
@@ -154,7 +194,7 @@
 
         return (workHours, workMinutes);
     }
-    
+
     async Task GetTimesheetRecords()
     {
         var timeEntries = await IndexedDbManager.GetAll<TimeEntry>();
@@ -169,6 +209,16 @@
     void ExpandSummary()
     {
         _summaryExpanded = !_summaryExpanded;
+    }
+
+    private async Task PrintTimesheet()
+    {
+        var pdfDoc = DocumentTool.GenerateDateTimeRecord(_timeEntries, _currentTimestamp);
+        // saving document as image
+        //var base64PngImageString = Convert.ToBase64String(document.GeneratePdf());
+
+        var currentTimestamp = DateTime.Now;
+        await Downloader.DownloadAsync(pdfDoc, $"{currentTimestamp:MMddyy-hhmmss}-timely_dtr_sheet-{_currentTimestamp:MMMM}.pdf".ToLower());
     }
 
 }
